@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Infotaf</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="jquery-1.7.2.min.js"></script>
+  <script src="script.js"></script>
+</head>
+<body>
+  <h1>TAF Li212</h1>
+  <div id="form">
+    <form>
+      <fieldset>
+        <legend>PG</legend>
+        <label for="nums-pg">Num's</label>
+        <input type="text" name="taille" id="nums-pg" placeholder="80Li212"/>
+        <input type="button" value="Go!" id="send-button"/>
+      </fieldset>
+    </form>
+  </div>
+  <div id="no-result">
+    <h2>Aucun résultat</h2>
+  </div>
+  <div id="result">
+    <h2 id="pg-name"></h2>
+    <h3>Déja payé: <span id="total-paye"></span></h3>
+    <h3>Montant à payer: <span id="total-taf"></span></h3>
+    <fieldset>
+      <legend>Consos</legend>
+      <div id="table-manips">
+        <table>
+          <thead>
+            <tr>
+              <th>Nom</th><th>Quantité</th><th>Prix</th><th>Sous total</th>
+            </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
+      </div>
+      <div id="table-cotizs">
+        <table>
+          <thead>
+            <tr>
+              <th>Nom</th><th>Prix</th><th>Payée</th>
+            </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
+      </div>
+    </fieldset>
+  </div>
+</body>
+</html>

@@ -1,0 +1,29 @@
+#table-manips{
+  display:inline-block;
+}
+
+#table-cotizs{
+  padding-left:50px;
+  display:inline-block;
+  vertical-align:top
+}
+
+#result{
+  display: none;
+}
+#no-result{
+  display: none;
+}
+
+.number{
+  text-align:right;
+}
+
+table {
+  border-style:solid;
+  border-collapse: collapse;
+}
+
+td, th {
+border: thin solid;
+}
