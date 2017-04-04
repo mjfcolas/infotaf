@@ -1,6 +1,7 @@
 #Fichiers CSV 
 *.csv*
 #Fichiers non tracés 
-jquery-1.7.2.min.js
+front/jquery-1.7.2.min.js
 back/restapi/.*
 back/restapi/target
+local
