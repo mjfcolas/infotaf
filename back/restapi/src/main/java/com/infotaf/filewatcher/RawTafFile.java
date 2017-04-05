@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -26,6 +28,8 @@ import com.opencsv.CSVReader;
 @Component
 @Scope(value = "prototype")
 public class RawTafFile {
+	
+	private static final Logger logger = LoggerFactory.getLogger(RawTafFile.class);
 	
 	/**
 	 * Hashmap contenant le type des colonnes (première ligne du fichier
@@ -66,6 +70,7 @@ public class RawTafFile {
 	 * @throws IOException
 	 */
 	public RawTafFile(CSVReader reader) throws IOException {
+		logger.debug("IN");
 		String[] rawLine;
 		int i = 0;
 		int j = 0;
@@ -96,6 +101,7 @@ public class RawTafFile {
 	 * @return Liste d'index
 	 */
 	private List<Integer> getCidsForKey(String key){
+		logger.debug("IN - key: {}", key);
 		List<Integer> result = new ArrayList<Integer>();
 		for (Integer mapKey : columnsMap.keySet()) {
 			if(columnsMap.get(mapKey) != null && columnsMap.get(mapKey).equals(key)){
@@ -110,6 +116,7 @@ public class RawTafFile {
 	 * @return Liste d'index
 	 */
 	private List<Integer> getCidsForKeys(List<String> keys){
+		logger.debug("IN - key: {}", keys.toString());
 		List<Integer> result = new ArrayList<Integer>();
 		for (Integer mapKey : columnsMap.keySet()) {
 			if(columnsMap.get(mapKey) != null && keys.contains(columnsMap.get(mapKey))){
@@ -124,6 +131,7 @@ public class RawTafFile {
 	 * @return Liste d'index
 	 */
 	private List<Integer> getRidsForKey(String key){
+		logger.debug("IN - key: {}", key);
 		List<Integer> result = new ArrayList<Integer>();
 		for (Integer mapKey : rowsMap.keySet()) {
 			if(rowsMap.get(mapKey) != null && rowsMap.get(mapKey).equals(key)){
@@ -138,6 +146,7 @@ public class RawTafFile {
 	 * @return index
 	 */
 	private Integer getCidForKey(String key){
+		logger.debug("IN - key: {}", key);
 		for (Integer mapKey : columnsMap.keySet()) {
 			if(columnsMap.get(mapKey) != null && columnsMap.get(mapKey).equals(key)){
 				return mapKey;
@@ -151,6 +160,7 @@ public class RawTafFile {
 	 * @return index
 	 */
 	private Integer getRidForKey(String key){
+		logger.debug("IN - key: {}", key);
 		for (Integer mapKey : rowsMap.keySet()) {
 			if(rowsMap.get(mapKey) != null && rowsMap.get(mapKey).equals(key)){
 				return mapKey;
@@ -164,6 +174,7 @@ public class RawTafFile {
 	 * @return List de Pg pret à êtr eenregistrés en base
 	 */
 	public List<Pg> getPgs(){
+		logger.debug("IN");
 		List<Pg> pgs = new ArrayList<Pg>();
 		List<Integer> pgLineIds = getRidsForKey(pgKey);
 		Integer numsColId = getCidForKey(numsKey);
@@ -190,6 +201,7 @@ public class RawTafFile {
 	 * @return Liste des manips prète à être enregistrée en base
 	 */
 	public List<Manip> getManips(){
+		logger.debug("IN");
 		List<Manip> manips = new ArrayList<Manip>();
 		List<String> keysForPgManips = new ArrayList<String>();
 		keysForPgManips.add(cotizKey);
@@ -224,6 +236,7 @@ public class RawTafFile {
 	 * @return Liste de PgManip prète à être enregistrée en base
 	 */
 	public List<PgManip> getPgManips(){
+		logger.debug("IN");
 		List<PgManip> pgManips = new ArrayList<PgManip>();
 		List<String> keysForPgManips = new ArrayList<String>();
 		keysForPgManips.add(cotizKey);

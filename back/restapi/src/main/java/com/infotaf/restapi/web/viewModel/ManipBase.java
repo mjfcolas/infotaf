@@ -2,6 +2,9 @@ package com.infotaf.restapi.web.viewModel;
 
 import java.math.BigDecimal;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.infotaf.restapi.model.Manip;
 import com.infotaf.restapi.model.PgManip;
 
@@ -12,6 +15,8 @@ import com.infotaf.restapi.model.PgManip;
  */
 public class ManipBase{
 	
+	private static final Logger logger = LoggerFactory.getLogger(ManipBase.class);
+	
 	protected int id;
 	protected int type;
 	protected String nom;
@@ -20,6 +25,7 @@ public class ManipBase{
 	protected BigDecimal totalPrice;
 	
 	ManipBase(PgManip pgManip){
+		logger.debug("IN - pgManip.id: {}", pgManip.getId());
 		Manip manip = pgManip.getManip();
 		if(manip != null){
 			this.id = manip.getId();
@@ -66,6 +72,7 @@ public class ManipBase{
 	 * @return
 	 */
 	public BigDecimal getTotalPrice(){
+		logger.debug("IN - manip.id: {}", this.getId());
 		if(this.quantite != null && this.prix != null){
 			if(this.type == 1){//Manip normale
 				return this.quantite.multiply(this.prix);

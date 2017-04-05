@@ -1,12 +1,12 @@
 package com.infotaf.restapi.web.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.infotaf.restapi.model.Manip;
-import com.infotaf.restapi.model.Pg;
 import com.infotaf.restapi.service.ManipService;
 import com.infotaf.restapi.service.PgService;
 import com.infotaf.restapi.web.viewModel.PgComplete;
@@ -15,6 +15,8 @@ import com.infotaf.restapi.web.viewModel.PgComplete;
 @CrossOrigin
 public class BaseController {
 
+	private static final Logger logger = LoggerFactory.getLogger(BaseController.class);
+	
 	@Autowired
 	protected PgService pgService;
 	@Autowired
@@ -27,7 +29,10 @@ public class BaseController {
 	 */
 	@RequestMapping("Pg")
 	public PgComplete GetPg(String pg){
+		logger.debug("IN - pg: {}", pg);
+
 		PgComplete toReturn = pgService.getPgWithManips(pg);
+		
 		return toReturn;
 	}
 }

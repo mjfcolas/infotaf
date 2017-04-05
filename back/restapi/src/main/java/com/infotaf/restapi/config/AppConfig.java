@@ -24,7 +24,7 @@ import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
  */
 @Configuration
 @EnableTransactionManagement(proxyTargetClass=true)
-@PropertySource(value = { "classpath:configuration.properties" })
+@PropertySource(value = { "classpath:application.properties" })
 public class AppConfig{
 
 	//Propriétés 
@@ -32,7 +32,7 @@ public class AppConfig{
 	
 	static{
 		try {
-			prop.load(AppConfig.class.getClassLoader().getResourceAsStream("configuration.properties"));
+			prop.load(AppConfig.class.getClassLoader().getResourceAsStream("application.properties"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
