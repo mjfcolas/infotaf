@@ -7,4 +7,4 @@ back/restapi/target
 local
 
 #configuration spécifique à chacun
-/back/restapi/src/main/resources/configuration.properties
+/back/restapi/src/main/resources/application.properties
