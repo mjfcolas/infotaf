@@ -16,7 +16,7 @@ public class PgDao extends GenericDao<Pg> implements IPgDao{
 	public Pg getPg(String nums, String tbk, String proms){
 		logger.debug("IN - nums: {}, tbk: {}, proms: {}", nums, tbk , proms);
 		Criterion whereNums = Restrictions.eq("nums", nums);
-		Criterion whereTbk = Restrictions.eq("tbk", tbk);
+		Criterion whereTbk = Restrictions.eq("tbk", tbk).ignoreCase();
 		Criterion whereProms = Restrictions.eq("proms", proms);
 		
 		Pg pg = (Pg) getSession()
