@@ -26,9 +26,6 @@
 	    <groupId>org.springframework</groupId>
 	    <artifactId>spring-orm</artifactId>
 	</dependency>
-	
-
-	  
 	<!--HIBERNATE -->
 	<dependency>
 	    <groupId>org.hibernate</groupId>
@@ -57,7 +54,15 @@
 	    <artifactId>opencsv</artifactId>
 	    <version>3.8</version>
 	</dependency>
+	
+	<!-- JAVAMAIL -->
+	<dependency>
+	    <groupId>com.sun.mail</groupId>
+		<artifactId>javax.mail</artifactId>
+	</dependency>
   </dependencies>
+  
+  
   
   <build>
       <plugins>

@@ -29,10 +29,14 @@ public class AppConfig{
 
 	//Propriétés 
 	public static Properties prop = new Properties();
+	public static Properties mailProp = new Properties();
+	public static Properties configConstants = new Properties();
 	
 	static{
 		try {
 			prop.load(AppConfig.class.getClassLoader().getResourceAsStream("application.properties"));
+			mailProp.load(AppConfig.class.getClassLoader().getResourceAsStream("mail.properties"));
+			configConstants.load(AppConfig.class.getClassLoader().getResourceAsStream("configConstants.properties"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

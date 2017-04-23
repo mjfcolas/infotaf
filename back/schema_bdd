@@ -2,10 +2,6 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 9.4.10
--- Dumped by pg_dump version 9.4.10
--- Started on 2017-04-03 22:37:15 CEST
-
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET client_encoding = 'UTF8';
@@ -14,7 +10,6 @@ SET check_function_bodies = false;
 SET client_min_messages = warning;
 
 --
--- TOC entry 1 (class 3079 OID 11861)
 -- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
 --
 
@@ -22,8 +17,6 @@ CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 
 
 --
--- TOC entry 2031 (class 0 OID 0)
--- Dependencies: 1
 -- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
 --
 
@@ -33,7 +26,6 @@ COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 SET search_path = public, pg_catalog;
 
 --
--- TOC entry 177 (class 1259 OID 16613)
 -- Name: manip_seq; Type: SEQUENCE; Schema: public; Owner: infotaf
 --
 
@@ -52,7 +44,6 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- TOC entry 174 (class 1259 OID 16579)
 -- Name: manip; Type: TABLE; Schema: public; Owner: infotaf; Tablespace: 
 --
 
@@ -67,7 +58,33 @@ CREATE TABLE manip (
 ALTER TABLE manip OWNER TO infotaf;
 
 --
--- TOC entry 176 (class 1259 OID 16610)
+-- Name: param; Type: TABLE; Schema: public; Owner: infotaf; Tablespace: 
+--
+
+CREATE TABLE param (
+    id integer NOT NULL,
+    key text NOT NULL,
+    value text
+);
+
+
+ALTER TABLE param OWNER TO infotaf;
+
+--
+-- Name: param_seq; Type: SEQUENCE; Schema: public; Owner: infotaf
+--
+
+CREATE SEQUENCE param_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    MAXVALUE 2147483648
+    CACHE 1;
+
+
+ALTER TABLE param_seq OWNER TO infotaf;
+
+--
 -- Name: pg_seq; Type: SEQUENCE; Schema: public; Owner: infotaf
 --
 
@@ -82,7 +99,6 @@ CREATE SEQUENCE pg_seq
 ALTER TABLE pg_seq OWNER TO infotaf;
 
 --
--- TOC entry 173 (class 1259 OID 16569)
 -- Name: pg; Type: TABLE; Schema: public; Owner: infotaf; Tablespace: 
 --
 
@@ -99,7 +115,6 @@ CREATE TABLE pg (
 ALTER TABLE pg OWNER TO infotaf;
 
 --
--- TOC entry 178 (class 1259 OID 16616)
 -- Name: pg_manip_seq; Type: SEQUENCE; Schema: public; Owner: infotaf
 --
 
@@ -114,7 +129,6 @@ CREATE SEQUENCE pg_manip_seq
 ALTER TABLE pg_manip_seq OWNER TO infotaf;
 
 --
--- TOC entry 175 (class 1259 OID 16595)
 -- Name: pg_manip; Type: TABLE; Schema: public; Owner: infotaf; Tablespace: 
 --
 
@@ -129,7 +143,6 @@ CREATE TABLE pg_manip (
 ALTER TABLE pg_manip OWNER TO infotaf;
 
 --
--- TOC entry 1908 (class 2606 OID 16594)
 -- Name: MANIP_PK; Type: CONSTRAINT; Schema: public; Owner: infotaf; Tablespace: 
 --
 
@@ -138,7 +151,14 @@ ALTER TABLE ONLY manip
 
 
 --
--- TOC entry 1912 (class 2606 OID 16599)
+-- Name: PARAM_PK; Type: CONSTRAINT; Schema: public; Owner: infotaf; Tablespace: 
+--
+
+ALTER TABLE ONLY param
+    ADD CONSTRAINT "PARAM_PK" PRIMARY KEY (id);
+
+
+--
 -- Name: PG_MANIP_PK; Type: CONSTRAINT; Schema: public; Owner: infotaf; Tablespace: 
 --
 
@@ -147,7 +167,6 @@ ALTER TABLE ONLY pg_manip
 
 
 --
--- TOC entry 1904 (class 2606 OID 16578)
 -- Name: PG_NUMS_PROMS; Type: CONSTRAINT; Schema: public; Owner: infotaf; Tablespace: 
 --
 
@@ -156,7 +175,6 @@ ALTER TABLE ONLY pg
 
 
 --
--- TOC entry 1906 (class 2606 OID 16576)
 -- Name: PG_PK; Type: CONSTRAINT; Schema: public; Owner: infotaf; Tablespace: 
 --
 
@@ -165,7 +183,6 @@ ALTER TABLE ONLY pg
 
 
 --
--- TOC entry 1910 (class 2606 OID 16629)
 -- Name: UNIQUE_NOM; Type: CONSTRAINT; Schema: public; Owner: infotaf; Tablespace: 
 --
 
@@ -174,7 +191,6 @@ ALTER TABLE ONLY manip
 
 
 --
--- TOC entry 1913 (class 2606 OID 16600)
 -- Name: PG_MANIP_MANIP_FK; Type: FK CONSTRAINT; Schema: public; Owner: infotaf
 --
 
@@ -183,7 +199,6 @@ ALTER TABLE ONLY pg_manip
 
 
 --
--- TOC entry 1914 (class 2606 OID 16605)
 -- Name: PG_MANIP_PG_FK; Type: FK CONSTRAINT; Schema: public; Owner: infotaf
 --
 
@@ -192,8 +207,6 @@ ALTER TABLE ONLY pg_manip
 
 
 --
--- TOC entry 2030 (class 0 OID 0)
--- Dependencies: 6
 -- Name: public; Type: ACL; Schema: -; Owner: postgres
 --
 
@@ -202,8 +215,6 @@ REVOKE ALL ON SCHEMA public FROM postgres;
 GRANT ALL ON SCHEMA public TO postgres;
 GRANT ALL ON SCHEMA public TO PUBLIC;
 
-
--- Completed on 2017-04-03 22:37:15 CEST
 
 --
 -- PostgreSQL database dump complete

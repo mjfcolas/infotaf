@@ -8,3 +8,4 @@ local
 
 #configuration spécifique à chacun
 back/restapi/src/main/resources/application.properties
+back/restapi/src/main/resources/mail.properties
