@@ -2,6 +2,7 @@ function DisplayTaf(){
 }
 
 DisplayTaf.prototype.init = function(){
+  this.loadInfos();
   $("#send-button").on("click", this.loadTaf());
 }
 
@@ -16,10 +17,26 @@ DisplayTaf.prototype.loadTaf = function(){
         pg:$("#nums-pg").val()
       },
       success:self.displayTafForPg,
-      error:function(e){
-        console.error("Erreur d'accès à l'API", e)
-      }
+      error:self.displayError
     });
+  }
+}
+
+DisplayTaf.prototype.loadInfos = function(){
+  var self = this;
+  $.ajax({
+    url:'http://localhost:8080/Infos',
+    crossDomain:true,
+    dataType:"json",
+    success:self.displayInfos,
+    error:self.displayError
+  });
+}
+
+DisplayTaf.prototype.displayInfos = function(data){
+  if(data && data.date){
+    var date = new Date(data.date);
+    $("#update-date").text(utils.formatDate(date));
   }
 }
 
@@ -69,6 +86,11 @@ DisplayTaf.prototype.displayTafForPg = function(data){
   }
 }
 
+DisplayTaf.prototype.displayError = function(e){
+  console.error("Erreur d'accès à l'API", e);
+}
+
+var utils = new Utils();
 var displayTaf = new DisplayTaf();
 $(document).ready(function(){
   displayTaf.init();

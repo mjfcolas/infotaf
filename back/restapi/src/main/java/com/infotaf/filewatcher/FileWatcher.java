@@ -92,7 +92,9 @@ public class FileWatcher {
 			Thread.sleep(sleepTime*1000);
 		}
 	}
-	
+	/**
+	 * Lecture des mails pour chercher les pièces jointes qui peuvent être importées
+	 */
 	private void checkFilesInMails(){
 		try
 		{
@@ -119,18 +121,7 @@ public class FileWatcher {
 		    boolean goodMailFound = false;
 		    
 		    //Récupération de la dernière date de mise à jour
-		    String key = AppConfig.configConstants.getProperty("param.key.updatedate");
-		    Param updateDateParam = paramService.getParam(key);
-		    String updateDateString = "";
-		    if(updateDateParam != null){
-		    	updateDateString = updateDateParam.getValue();
-		    }
-		    Date updateDate = null;
-		    if(!updateDateString.equals("")){
-			    String dateFormat = (String) AppConfig.prop.get("infotaf.dateformat");
-			    SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
-			    updateDate = formatter.parse(updateDateString);
-		    }
+		    Date updateDate = paramService.getDateFromParam();
 		    
 		    for (int i = messages.length -1; i >= 0; i--) {
 		    	Message message = messages[i];
@@ -220,7 +211,9 @@ public class FileWatcher {
 			}
 		}	
 	}
-	
+	/**
+	 * Lecture d'un dossier pour importer les fichiers qui peuvent l'être
+	 */
 	private void checkFilesInFolder(){
 		String directory = (String) AppConfig.prop.get("filewatcher.directory");
 		logger.trace("Verification des fichiers : {}", directory);
