@@ -53,8 +53,10 @@ DisplayTaf.prototype.displayTafForPg = function(data){
     var tbk = data.tbk? data.tbk : "";
     var proms = data.proms? data.proms : "";
     var totalTaf = data.totalTaf || data.totalTaf === 0 ? data.totalTaf.toFixed(2) + " €" : "";
+    var totalDu  = data.totalDu || data.totalDu === 0 ? data.totalDu.toFixed(2) + " €" : "";
     $("#pg-name").text(firstName + " " + lastName + " " + nums + tbk + proms);
     $("#total-taf").text(totalTaf);
+    $("#a-payer").text(totalDu);
 
     if(data.totalTaf <= 0){
       $("#total-taf").addClass("text-color-green");

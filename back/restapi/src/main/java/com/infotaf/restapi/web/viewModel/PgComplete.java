@@ -21,6 +21,7 @@ public class PgComplete{
 	protected String firstName;
 	protected String lastName;
 	protected BigDecimal totalTaf;
+	protected BigDecimal totalDu;
 	
 	protected List<ManipBase> manips = new ArrayList<ManipBase>();
 	
@@ -118,6 +119,29 @@ public class PgComplete{
 					BigDecimal current = manip.getTotalPrice();
 					if(current != null){
 						result = result.add(current);
+					}
+				}
+			}
+		}
+		return result;
+	}
+	
+	/**
+	 * Calcul du  total à payer du Pg en prenant en compte le cout des cotizs,
+	 * et ses participations aux manips
+	 * @return
+	 */
+	public BigDecimal getTotalDu(){
+		BigDecimal result = new BigDecimal(0);
+		
+		if(manips != null){
+			for (ManipBase manip : manips) {
+				if(manip != null){
+					if(manip.getType() != 3){//On ne prend pas en compte les apports
+						BigDecimal current = manip.getTotalPrice();
+						if(current != null){
+							result = result.add(current);
+						}
 					}
 				}
 			}
