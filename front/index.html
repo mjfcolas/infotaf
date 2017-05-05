@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <title>Infotaf</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style-table.css">
   <script src="jquery-1.7.2.min.js"></script>
   <script src="utils.js"></script>
   <script src="script.js"></script>
@@ -15,48 +16,70 @@
     </div>
     <div class="float-right inline-block">Mise à jour : <span id="update-date"></span></div>
   </div>
-  <div id="form">
-    <form>
+  <div class="left-block">
+    <div>
       <fieldset>
         <legend>PG</legend>
-        <label for="nums-pg">Num's</label>
-        <input type="text" name="taille" id="nums-pg" placeholder="80Li212"/>
-        <input type="button" value="Go!" id="send-button"/>
+        <form id="form">
+          <label for="nums-pg">Num's</label>
+          <input type="text" id="nums-pg" placeholder="80Li212"/>
+          <input type="button" value="Go!" id="send-button"/>
+        </form>
+        <div id="pg-infos">
+          <div class="no-result">
+            <div class="pg-infos-legend important">Aucun résultat</div>
+          </div>
+          <div class="result">
+            <div class="pg-infos-legend important" id="pg-name"></div>
+            <div id="payment" class="pg-infos-legend">
+              <div>Déja payé: <span class="float-right" id="total-paye"></span></div>
+              <div>Montant à payer: <span class="float-right" id="total-taf"></span></div>
+            </div>
+          </div>
+        </div>
       </fieldset>
-    </form>
+    </div>
+
+    <div id="consos" class="result">
+      <fieldset>
+        <legend>Consos</legend>
+        <div id="table-manips">
+          <table class="table-fill">
+            <thead>
+              <tr>
+                <th>Nom</th><th>Quantité</th><th>Prix</th><th>Sous total</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+        <div id="table-cotizs">
+          <table class="table-fill">
+            <thead>
+              <tr>
+                <th>Nom</th><th>Prix</th><th>Payée</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+      </fieldset>
+    </div>
   </div>
-  <div id="no-result">
-    <h2>Aucun résultat</h2>
-  </div>
-  <div id="result">
-    <h2 id="pg-name"></h2>
-    <h3>Déja payé: <span id="total-paye"></span></h3>
-    <h3>Montant à payer: <span id="total-taf"></span></h3>
-    <fieldset>
-      <legend>Consos</legend>
-      <div id="table-manips">
-        <table>
-          <thead>
-            <tr>
-              <th>Nom</th><th>Quantité</th><th>Prix</th><th>Sous total</th>
-            </tr>
-          </thead>
-          <tbody>
-          </tbody>
-        </table>
-      </div>
-      <div id="table-cotizs">
-        <table>
-          <thead>
-            <tr>
-              <th>Nom</th><th>Prix</th><th>Payée</th>
-            </tr>
-          </thead>
-          <tbody>
-          </tbody>
-        </table>
-      </div>
-    </fieldset>
+  <div class="right-block">
+    <div id="information">
+      <fieldset>
+        <legend>Informations</legend>
+        <h3>News 1</h3>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        <h3>News 2</h3>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        <h3>News 3</h3>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+      </fieldset>
+    </div>
   </div>
 </body>
 </html>

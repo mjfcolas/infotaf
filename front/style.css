@@ -1,17 +1,57 @@
+@import url(http://fonts.googleapis.com/css?family=Roboto:400,500,700,300,100);
+
 #table-manips{
+  padding-right:50px;
+  padding-bottom: 20px;
   display:inline-block;
 }
 
 #table-cotizs{
-  padding-left:50px;
   display:inline-block;
-  vertical-align:top
+  vertical-align:top;
 }
 
-#result{
+.left-block{
+  display:inline-block;
+  width:70%;
+}
+.right-block{
+  display:inline-block;
+  width:28%;
+  vertical-align:top;
+}
+
+#form{
+  padding-right:50px;
+  display:inline-block;
+}
+
+.inline-block{
+  display:inline-block;
+}
+
+#consos{
   display: none;
 }
-#no-result{
+
+#pg-infos{
+  display:inline-block;
+  vertical-align:center;
+}
+
+#payment{
+  padding-left:25px;
+  vertical-align: center;
+}
+
+#nums-pg{
+  width:75px;
+}
+
+.result{
+  display: none;
+}
+.no-result{
   display: none;
 }
 
@@ -26,11 +66,31 @@
   display:inline-block;
 }
 
-table {
-  border-style:solid;
-  border-collapse: collapse;
+.text-color-red{
+  color: red;
 }
 
-td, th {
-border: thin solid;
+.text-color-green{
+  color: green;
+}
+
+.pg-infos-legend.important{
+  display:inline-block;
+  font-size: 125%;
+  font-weight: bold;
+}
+
+.pg-infos-legend{
+  display:inline-block;
+}
+
+body {
+  font-family: "Roboto", helvetica, arial, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  text-rendering: optimizeLegibility;
+}
+
+form{
+  margin:10px;
 }

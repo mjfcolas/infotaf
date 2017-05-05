@@ -42,19 +42,28 @@ DisplayTaf.prototype.displayInfos = function(data){
 
 DisplayTaf.prototype.displayTafForPg = function(data){
   if(!data){
-    $("#result").hide();
-    $("#no-result").show();
+    $(".result").hide();
+    $(".no-result").show();
   }else{
-    $("#result").show();
-    $("#no-result").hide();
+    $(".result").css("display", "inline");
+    $(".no-result").hide();
     var firstName = data.firstName? data.firstName : "";
     var lastName = data.lastName? data.lastName : "";
     var nums = data.nums? data.nums : "";
     var tbk = data.tbk? data.tbk : "";
     var proms = data.proms? data.proms : "";
     var totalTaf = data.totalTaf || data.totalTaf === 0 ? data.totalTaf.toFixed(2) + " €" : "";
-    $("#pg-name").text(firstName + " " + lastName + " " + nums + tbk + proms)
-    $("#total-taf").text(totalTaf)
+    $("#pg-name").text(firstName + " " + lastName + " " + nums + tbk + proms);
+    $("#total-taf").text(totalTaf);
+
+    if(data.totalTaf <= 0){
+      $("#total-taf").addClass("text-color-green");
+      $("#total-taf").removeClass("text-color-red");
+    }else{
+      $("#total-taf").addClass("text-color-red");
+      $("#total-taf").removeClass("text-color-green");
+    }
+
     if(data.manips){
       var manipTable = $("#table-manips tbody");
       var cotizTable = $("#table-cotizs tbody");
