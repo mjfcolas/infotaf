@@ -11,6 +11,7 @@ echo 'suppression du service'
 rm /etc/init.d/infotaf
 echo 'creation du nouveau service'
 cp infotaf /etc/init.d/infotaf
+chmod 755 /etc/init.d/infotaf
 echo 'copie du package java'
 cp restapi-$VERSION.jar $PATH_TO_JAR
 echo 'Suppression du front'

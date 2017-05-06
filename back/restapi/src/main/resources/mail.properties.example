@@ -1,7 +1,0 @@
-mail.server.imap=
-mail.server.user=
-mail.oautch.clientid=
-mail.oauth.secret=
-mail.oauth.refreshtoken=
-
-mail.app.subject=

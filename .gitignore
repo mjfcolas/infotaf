@@ -1,11 +1,10 @@
-#Fichiers CSV 
+#Fichiers CSV
 *.csv*
-#Fichiers non tracés 
+#Fichiers non tracés
 front/jquery-1.7.2.min.js
 back/restapi/.*
 back/restapi/target
 local
 
 #configuration spécifique à chacun
-back/restapi/src/main/resources/application.properties
-back/restapi/src/main/resources/mail.properties
+back/restapi/profiles
