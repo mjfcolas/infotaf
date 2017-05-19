@@ -10,7 +10,7 @@ DisplayTaf.prototype.loadTaf = function(){
   var self = this;
   return function(){
     $.ajax({
-      url:'http://localhost:8080/Pg',
+      url:properties.serverUrl+'Pg',
       crossDomain:true,
       dataType:"json",
       data:{
@@ -25,7 +25,7 @@ DisplayTaf.prototype.loadTaf = function(){
 DisplayTaf.prototype.loadInfos = function(){
   var self = this;
   $.ajax({
-    url:'http://localhost:8080/Infos',
+    url:properties.serverUrl+'Infos',
     crossDomain:true,
     dataType:"json",
     success:self.displayInfos,
