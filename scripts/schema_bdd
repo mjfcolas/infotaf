@@ -58,6 +58,34 @@ CREATE TABLE manip (
 ALTER TABLE manip OWNER TO infotaf;
 
 --
+-- Name: news_seq; Type: SEQUENCE; Schema: public; Owner: infotaf
+--
+
+CREATE SEQUENCE news_seq
+    START WITH 387
+    INCREMENT BY 1
+    NO MINVALUE
+    MAXVALUE 2147483648
+    CACHE 1;
+
+
+ALTER TABLE news_seq OWNER TO infotaf;
+
+--
+-- Name: news; Type: TABLE; Schema: public; Owner: infotaf; Tablespace: 
+--
+
+CREATE TABLE news (
+    id integer DEFAULT nextval('news_seq'::regclass) NOT NULL,
+    title text NOT NULL,
+    content text,
+    date date
+);
+
+
+ALTER TABLE news OWNER TO infotaf;
+
+--
 -- Name: param; Type: TABLE; Schema: public; Owner: infotaf; Tablespace: 
 --
 
@@ -148,6 +176,14 @@ ALTER TABLE pg_manip OWNER TO infotaf;
 
 ALTER TABLE ONLY manip
     ADD CONSTRAINT "MANIP_PK" PRIMARY KEY (id);
+
+
+--
+-- Name: NEWS_PK; Type: CONSTRAINT; Schema: public; Owner: infotaf; Tablespace: 
+--
+
+ALTER TABLE ONLY news
+    ADD CONSTRAINT "NEWS_PK" PRIMARY KEY (id);
 
 
 --

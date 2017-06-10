@@ -77,12 +77,19 @@ public class Utils{
 				}
 			}
 			
+			if(firstCut == null){
+				firstCut = 0;
+			}
+			if(secondCut == null){
+				secondCut = 0;
+			}
+			
 			String nums = id.substring(0, firstCut);
-			String tbk = id.substring(0, firstCut);
+			String tbk = id.substring(firstCut, secondCut);
 			String proms = id.substring(secondCut);
 			logger.debug("fin du parse : nums: {}, tbk: {}, proms: {}", nums, tbk, proms);
 			result.put("nums", nums);
-			result.put("tbk", id.substring(firstCut, secondCut));
+			result.put("tbk", tbk);
 			result.put("proms", proms);	
 			return result;
 		}catch(Exception e){

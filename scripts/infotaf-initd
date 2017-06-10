@@ -1,5 +1,6 @@
 #!/bin/sh
 SERVICE_NAME=Infotaf
+VERSION=0.0.4
 PATH_TO_JAR=
 PID_PATH_NAME=/tmp/infotaf-pid
 USER=

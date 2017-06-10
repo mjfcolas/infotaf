@@ -1,3 +1,3 @@
 properties={
-  serverUrl:'http://example:8080/'
+  serverUrl:'http://localhost:8080/'
 }

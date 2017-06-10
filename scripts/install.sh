@@ -1,4 +1,5 @@
 #!/bin/sh
+USER=$1
 VERSION=
 PATH_TO_JAR=/chemin/restapi-$VERSION.jar
 PATH_TO_FRONT=/chemin
