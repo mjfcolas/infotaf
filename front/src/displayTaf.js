@@ -2,7 +2,14 @@ function DisplayTaf(){
 }
 
 DisplayTaf.prototype.init = function(){
+  var self=this;
   $("#send-button").on("click", this.loadTaf());
+  $('#form').keypress(function (e) {
+    if (e.which == 13) {
+      setTimeout(self.loadTaf(), 0)
+      return false;
+    }
+  });
 }
 
 DisplayTaf.prototype.loadTaf = function(){
