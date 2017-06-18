@@ -2,6 +2,8 @@
 *.csv*
 #Fichiers non tracés
 front/src/jquery-1.7.2.min.js
+front/src/bootstrap.min.js
+front/src/bootstrap.min.css
 back/restapi/.*
 back/restapi/target
 local

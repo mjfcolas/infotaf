@@ -29,6 +29,10 @@ public class Pg{
 	protected String proms;
 	protected String firstName;
 	protected String lastName;
+	protected String workplace;
+	protected String address;
+	protected String work;
+	protected String workDetails;
 	
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "pg")
 	protected List<PgManip> pgManips;
@@ -69,6 +73,30 @@ public class Pg{
 	}
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
+	}
+	public String getWorkplace() {
+		return workplace;
+	}
+	public void setWorkplace(String workplace) {
+		this.workplace = workplace;
+	}
+	public String getAddress() {
+		return address;
+	}
+	public void setAddress(String address) {
+		this.address = address;
+	}
+	public String getWork() {
+		return work;
+	}
+	public void setWork(String work) {
+		this.work = work;
+	}
+	public String getWorkDetails() {
+		return workDetails;
+	}
+	public void setWorkDetails(String workDetails) {
+		this.workDetails = workDetails;
 	}
 	public List<PgManip> getPgManips() {
 		return pgManips;
