@@ -40,4 +40,14 @@ public interface IPgService{
 	 * Purge de la table pg en base
 	 */
 	public void deletePg();
+	/**
+	 * Mise à jour des informations kifekoi en se basant sur la clé unique nums tbk proms
+	 * @param pg le Pg avec les informations kifekoi à jour
+	 */
+	public void updateKifekoi(Pg pg);
+	/**
+	 * Modification du mot de passe d'un PG
+	 * @param pg le Pg avec le nouveau mot de passe non encodé
+	 */
+	public void updatePassword(Pg pg);
 }

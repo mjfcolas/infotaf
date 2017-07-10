@@ -6,11 +6,12 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.infotaf.restapi.common.exceptions.PgFormatException;
-import com.infotaf.restapi.common.utils.Utils;
+import com.infotaf.common.exceptions.PgFormatException;
+import com.infotaf.common.utils.Utils;
 import com.infotaf.restapi.data.PgDao;
 import com.infotaf.restapi.data.PgManipDao;
 import com.infotaf.restapi.model.Pg;
@@ -41,7 +42,7 @@ public class PgService implements IPgService{
 	@Transactional(readOnly = true)
 	public PgComplete getPgWithManips(String pgId){
 		logger.debug("IN - pgId: {}", pgId);
-		//Formattage de la clé unique sur laquelle le filtr eva être effectué à partir du paramètre pgId
+		//Formattage de la clé unique sur laquelle le filtre va être effectué à partir du paramètre pgId
 		Map<String, String> parsedPg;
 		try {
 			parsedPg = Utils.ParsePg(pgId);
@@ -72,5 +73,32 @@ public class PgService implements IPgService{
 	@Transactional(readOnly = false)
 	public void deletePg(){
     	pgDao.deleteAll();
+	}
+	
+	@Transactional(readOnly = false)
+	public void updateKifekoi(Pg pg){
+		logger.debug("IN - nums: {}, tbk: {}, proms: {}", pg.getNums(), pg.getTbk() , pg.getProms());
+		
+		Pg pgDb = pgDao.getPg(pg.getNums(), pg.getTbk(), pg.getProms());
+		if(pgDb != null){
+			pgDb.setWork(pg.getWork());
+			pgDb.setWorkplace(pg.getWorkplace());
+			pgDb.setAddress(pg.getAddress());
+			pgDb.setWorkDetails(pg.getWorkDetails());
+			pgDao.update(pgDb);
+		}
+	}
+	
+	@Transactional(readOnly = false)
+	public void updatePassword(Pg pg){
+		logger.debug("IN - nums: {}, tbk: {}, proms: {}", pg.getNums(), pg.getTbk() , pg.getProms());
+		
+		Pg pgDb = pgDao.getPg(pg.getNums(), pg.getTbk(), pg.getProms());
+		if(pgDb != null){
+			BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+			String encodedPassword = encoder.encode(pg.getPassword());
+			pgDb.setPassword(encodedPassword);
+			pgDao.update(pgDb);
+		}
 	}
 }

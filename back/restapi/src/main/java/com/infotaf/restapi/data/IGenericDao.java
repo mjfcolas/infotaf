@@ -17,6 +17,11 @@ public interface IGenericDao<E>{
 	 */
 	Serializable save(E entity);
 	/**
+	 * Mise à jour d'un objet E en se basant sur sa clé primaire
+	 * @param entity objet considéré 
+	 */
+	public void update(E entity);
+	/**
 	 * Purge d'une table
 	 */
 	public void deleteAll();

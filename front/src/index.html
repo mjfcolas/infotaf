@@ -3,38 +3,58 @@
 <head>
   <meta charset="utf-8">
   <title>Infotaf</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="style-table.css">
-  <link rel="stylesheet" href="bootstrap.min.css">
-  <script src="jquery-1.7.2.min.js"></script>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style-table.css">
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <script src="lib/jquery-3.2.1.min.js"></script>
+  <script src="lib/bootstrap.min.js"></script>
+  <script src="lib/notify.min.js"></script>
+  <script src="lib/w3.js"></script>
   <script src="properties.js"></script>
   <script src="utils.js"></script>
+  <script src="login.js"></script>
   <script src="tabs.js"></script>
   <script src="displayTaf.js"></script>
   <script src="displayInfos.js"></script>
   <script src="displayNews.js"></script>
+  <script src="account.js"></script>
   <script src="index.js"></script>
 </head>
 <body>
+
+  <!-- Popins-->
+  <div w3-include-html="loginModal.html"></div>
+  <div w3-include-html="accountModal.html"></div>
+
   <div class="container">
     <div class="row">
       <div id="header" class="col-md-12">
         <div class="inline-block">
           <h1>TAF Li212</h1>
         </div>
-        <div class="float-right inline-block">Mise à jour : <span id="update-date"></span></div>
+        <div class="float-right inline-block">
+          <div>Mise à jour : <span id="update-date"></span></div>
+          <div><span id="login-info"></span></div>
+          <span style="display:none" class="logged-out">
+            <input type="button" value="Login" class="btn btn-primary" id="open-login-button" data-toggle="modal" data-target="#login-modal"/>
+          </span>
+          <span style="display:none" class="logged-in">
+            <input type="button" value="Logout" class="btn btn-primary" id="logout-button"/>
+            <input type="button" value="Compte" class="btn btn-primary" id="account-button" data-toggle="modal" data-target="#account-modal"/>
+          </span>
+        </div>
       </div>
     </div>
     <div class="row">
       <div class="col-md-8">
         <div class="row">
-          <div class="col-md-12"
+          <div class="col-md-12">
             <fieldset>
               <legend>PG</legend>
               <form id="form">
                 <label for="nums-pg">Num's</label>
                 <input type="text" id="nums-pg" placeholder="80Li212"/>
-                <input type="button" value="Go!" id="send-button"/>
+                <input type="button" value="Go!" class="btn btn-primary" id="send-button"/>
               </form>
               <div id="pg-infos">
                 <div class="no-result">
@@ -88,34 +108,42 @@
             </div>
             <div id="info-pg-tabs-content-kifekoi" class="info-pg-tabs-content">
               <div class="col-md-12">
-                <div class="row">
-                  <div class="col-xs-2">
-                    <label class="float-right">Job:</label>
+                <form id="kifekoi-form">
+                  <div class="row">
+                    <div class="col-xs-2">
+                      <label class="float-right">Job:</label>
+                    </div>
+                    <div id="pg-job" class="col-xs-10">
+                    </div>
                   </div>
-                  <div id="pg-job" class="col-xs-10">
+                  <div class="row">
+                    <div class="col-xs-2">
+                      <label class="float-right">Lieu:</label>
+                    </div>
+                    <div id="pg-place" class="col-xs-10">
+                    </div>
                   </div>
-                </div>
-                <div class="row">
-                  <div class="col-xs-2">
-                    <label class="float-right">Lieu:</label>
+                  <div class="row">
+                    <div class="col-xs-2">
+                      <label class="float-right">Détails:</label>
+                    </div>
+                    <div id="pg-job-details" class="col-xs-10">
+                    </div>
                   </div>
-                  <div id="pg-place" class="col-xs-10">
+                  <div class="row">
+                    <div class="col-xs-2">
+                      <label class="float-right">Adresse:</label>
+                    </div>
+                    <div id="pg-address" class="col-xs-10">
+                    </div>
                   </div>
-                </div>
-                <div class="row">
-                  <div class="col-xs-2">
-                    <label class="float-right">Détails:</label>
+                  <div class="row">
+                    <div class="col-xs-2">
+                      <button type="button" id="modify-button" class="btn btn-primary" style="display:none">Modifier</button>
+                      <button type="button" id="save-button" class="btn btn-primary" style="display:none">Sauver</button>
+                    </div>
                   </div>
-                  <div id="pg-job-details" class="col-xs-10">
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-xs-2">
-                    <label class="float-right">Adresse:</label>
-                  </div>
-                  <div id="pg-address" class="col-xs-10">
-                  </div>
-                </div>
+                </form>
               </div>
             </div>
           </div>

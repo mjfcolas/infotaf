@@ -2,7 +2,7 @@ package com.infotaf.test;
 
 import java.util.Map;
 
-import com.infotaf.restapi.common.utils.Utils;
+import com.infotaf.common.utils.Utils;
 
 import junit.framework.TestCase;
 

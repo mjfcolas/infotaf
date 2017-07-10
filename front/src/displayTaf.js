@@ -1,11 +1,16 @@
 function DisplayTaf(){
   this.tabs = new Tabs("info-pg-tabs", ["consos", "kifekoi"])
+  this.currentUser = null;
+  this.saveMode = false;
+  this.kifekoi = {};
 }
 
 DisplayTaf.prototype.init = function(){
   var self=this;
   this.tabs.init("consos");
   $("#send-button").on("click", this.loadTaf());
+  $("#modify-button").on("click", this.enableEdit());
+  $("#save-button").on("click", this.saveKifekoi());
   $('#form').keypress(function (e) {
     if (e.which == 13) {
       setTimeout(self.loadTaf(), 0)
@@ -19,7 +24,6 @@ DisplayTaf.prototype.loadTaf = function(){
   return function(){
     $.ajax({
       url:properties.serverUrl+'Pg',
-      crossDomain:true,
       dataType:"json",
       data:{
         pg:$("#nums-pg").val()
@@ -33,30 +37,109 @@ DisplayTaf.prototype.loadTaf = function(){
 DisplayTaf.prototype.renderInfos = function(){
   var self = this
   return function(data){
-    if(!data){
+    if(!data || !data.nums){
       $(".result").hide();
       $(".no-result").show();
     }else{
       $(".result").css("display", "inline");
       $(".no-result").hide();
 
+      self.currentUser = data.nums + data.tbk + data.proms
       self.displayGlobalPgInfos(data);
       self.renderPGConsos(data);
-      self.renderKifekoi(data);
+
+      self.cacheDatasKifekoi(data);
+      self.renderKifekoi();
+
     }
   }
 }
 
-DisplayTaf.prototype.renderKifekoi = function(data){
-  var workplace = data.workplace? data.workplace : "";
-  var address = data.address? data.address : "";
-  var work = data.work? data.work : "";
-  var workDetails = data.workDetails? data.workDetails : "";
+DisplayTaf.prototype.cacheDatasKifekoi = function(data){
+  this.kifekoi.workplace = data.workplace? data.workplace : "";
+  this.kifekoi.address = data.address? data.address : "";
+  this.kifekoi.work = data.work? data.work : "";
+  this.kifekoi.workDetails = data.workDetails? data.workDetails : "";
+}
 
-  $("#pg-job").text(work);
-  $("#pg-place").text(workplace);
-  $("#pg-job-details").text(workDetails);
-  $("#pg-address").text(address);
+DisplayTaf.prototype.renderKifekoi = function(){
+
+  $("#pg-job").text(this.kifekoi.work);
+  $("#pg-place").text(this.kifekoi.workplace);
+  $("#pg-job-details").text(this.kifekoi.workDetails);
+  $("#pg-address").text(this.kifekoi.address);
+
+  this.saveMode = false;
+  this.displaySaveAndModify();
+}
+
+DisplayTaf.prototype.displaySaveAndModify = function(enableEdit){
+  if(!this.saveMode || !enableEdit){
+    $("#save-button").hide();
+  }else{
+    $("#save-button").show();
+  }
+  if(!enableEdit && login.username && this.currentUser && login.username.toUpperCase() === this.currentUser.toUpperCase() ){
+    $("#modify-button").show();
+  }else{
+    $("#modify-button").hide();
+  }
+}
+
+DisplayTaf.prototype.enableEdit = function(){
+  var self = this;
+  return function(){
+    $("#pg-place").html('<input id="pg-place-input" name="workplace" class="kifekoi-input" type="text" maxlength=100 value="' + self.kifekoi.workplace + '"/>');
+    $("#pg-address").html('<input id="pg-address-input" name="address" class="kifekoi-input" type="text" maxlength=100 value="' + self.kifekoi.address + '"/>');
+    $("#pg-job").html('<input id="pg-job-input" name="work" class="kifekoi-input" type="text" maxlength=100 value="' + self.kifekoi.work + '"/>');
+    $("#pg-job-details").html('<textarea id="pg-job-details-textarea" name="workDetails" class="kifekoi-textarea" maxlength=2000/>');
+    $("#pg-job-details-textarea").val(self.kifekoi.workDetails);
+
+    self.saveMode = true;
+    self.displaySaveAndModify(true);
+  }
+}
+
+DisplayTaf.prototype.disableEdit = function(){
+
+  $("#save-button").removeAttr("disabled");
+  this.displaySaveAndModify(false);
+  this.renderKifekoi();
+
+}
+
+DisplayTaf.prototype.saveKifekoi = function(){
+  var self = this;
+  return function(){
+    $("#save-button").prop("disabled", "true");
+    $.ajax({
+      url:properties.serverUrl+'auth/SaveKifekoi',
+      dataType:"json",
+      type:'POST',
+      beforeSend:function(xhr) {
+        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+        xhr.setRequestHeader('X-Authorization', "Bearer " + localStorage.jwtToken);
+      },
+      data:utils.serializeFormWithUser($("#kifekoi-form"), login.username),
+      success:self.saveKifekoiSuccess(),
+      error:utils.displayError
+    });
+  }
+}
+
+DisplayTaf.prototype.saveKifekoiSuccess = function(){
+  var self = this;
+  return function(businessStatus){
+
+    self.kifekoi.workplace = $("#pg-place input").val();
+    self.kifekoi.address = $("#pg-address input").val();
+    self.kifekoi.work = $("#pg-job input").val();
+    self.kifekoi.workDetails = $("#pg-job-details-textarea").val();
+
+    utils.notifAlert(businessStatus);
+    self.disableEdit();
+  }
+
 }
 
 DisplayTaf.prototype.renderPGConsos = function(data){

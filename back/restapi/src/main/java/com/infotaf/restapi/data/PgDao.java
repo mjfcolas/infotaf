@@ -27,4 +27,5 @@ public class PgDao extends GenericDao<Pg> implements IPgDao{
 				.uniqueResult();
 		return pg;
 	}
+	
 }

@@ -28,7 +28,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import com.googleToken.GoogleToken;
-import com.infotaf.restapi.common.utils.Utils;
+import com.infotaf.common.utils.Utils;
 import com.infotaf.restapi.config.AppConfig;
 import com.infotaf.restapi.model.Manip;
 import com.infotaf.restapi.model.Param;

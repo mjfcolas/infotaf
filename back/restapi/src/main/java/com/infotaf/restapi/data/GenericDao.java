@@ -34,6 +34,11 @@ public abstract class GenericDao<E> implements IGenericDao<E>{
 	public Serializable save(E entity) {
 		return getSession().save(entity);
 	}
+	
+	public void update(E entity){
+		getSession().update(entity);
+	}
+	
 	public void deleteAll() {
 		List<E> entities = findAll();
 		for (E entity : entities) {

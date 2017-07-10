@@ -11,7 +11,13 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.infotaf.common.exceptions.UnauthorizedUserException;
+import com.infotaf.restapi.config.AppConfig;
+import com.infotaf.restapi.model.BusinessStatus;
 import com.infotaf.restapi.model.News;
+import com.infotaf.restapi.model.Pg;
+import com.infotaf.restapi.security.CheckUserAuthorize;
+import com.infotaf.restapi.security.auth.JwtAuthenticationToken;
 import com.infotaf.restapi.service.ManipService;
 import com.infotaf.restapi.service.NewsService;
 import com.infotaf.restapi.service.ParamService;
@@ -45,6 +51,10 @@ public class BaseController {
 
 		PgComplete toReturn = pgService.getPgWithManips(pg);
 		
+		if(toReturn == null){
+			toReturn = new PgComplete();
+		}
+		
 		return toReturn;
 	}
 	
@@ -76,4 +86,57 @@ public class BaseController {
 		List<News> toReturn = newsService.getNews();
 		return toReturn;
 	}
+	
+	/**
+	 * Sauvegarde des infos du kifekoi
+	 * @return
+	 */
+	@RequestMapping("auth/SaveKifekoi")
+	public BusinessStatus SaveKifekoi(JwtAuthenticationToken principal, Pg pg){
+		BusinessStatus result = new BusinessStatus();
+		try{
+			CheckUserAuthorize.checkUser(principal, pg);
+			
+			pgService.updateKifekoi(pg);
+			
+			result.setSuccess(true);
+			result.setMessage(AppConfig.messages.getProperty("notif.success"));
+		}catch(UnauthorizedUserException e){
+			result.setSuccess(false);
+			result.setMessage(AppConfig.messages.getProperty("notif.exception.unauthorizedUser"));
+			
+		}catch(Exception e){
+			result.setSuccess(false);
+			result.setMessage(AppConfig.messages.getProperty("notif.exception.unknownError"));
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * Changement de mot de passe
+	 * @return
+	 */
+	@RequestMapping("auth/ChangePassword")
+	public BusinessStatus ChangePassword(JwtAuthenticationToken principal, Pg pg){
+		BusinessStatus result = new BusinessStatus();
+		try{
+			CheckUserAuthorize.checkUser(principal, pg);
+			
+			pgService.updatePassword(pg);
+			
+			result.setSuccess(true);
+			result.setMessage(AppConfig.messages.getProperty("notif.success"));
+		}catch(UnauthorizedUserException e){
+			result.setSuccess(false);
+			result.setMessage(AppConfig.messages.getProperty("notif.exception.unauthorizedUser"));
+			
+		}catch(Exception e){
+			result.setSuccess(false);
+			result.setMessage(AppConfig.messages.getProperty("notif.exception.unknownError"));
+		}
+		
+		return result;
+	}
+
 }

@@ -80,6 +80,18 @@
   display:inline-block;
 }
 
+.hidden{
+  display:none;
+}
+
+.kifekoi-input{
+    width:100%;
+}
+.kifekoi-textarea{
+    width:100%;
+    resize: none;
+}
+
 body {
   font-family: "Roboto", helvetica, arial, sans-serif;
   font-size: 16px;

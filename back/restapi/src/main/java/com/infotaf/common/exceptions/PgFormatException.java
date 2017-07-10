@@ -1,4 +1,4 @@
-package com.infotaf.restapi.common.exceptions;
+package com.infotaf.common.exceptions;
 
 public class PgFormatException extends Exception{ 
 

@@ -9,7 +9,9 @@ DisplayNews.prototype.loadNews = function(){
   var self = this;
   $.ajax({
     url:properties.serverUrl+'News',
-    crossDomain:true,
+    beforeSend:function(xhr) {
+      xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+    }, 
     dataType:"json",
     success:self.displayNews,
     error:utils.displayError

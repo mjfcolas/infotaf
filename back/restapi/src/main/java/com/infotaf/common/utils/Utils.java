@@ -1,4 +1,4 @@
-package com.infotaf.restapi.common.utils;
+package com.infotaf.common.utils;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,7 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.infotaf.restapi.common.exceptions.PgFormatException;
+import com.infotaf.common.exceptions.PgFormatException;
 import com.infotaf.restapi.config.AppConfig;
 
 /**

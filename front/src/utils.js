@@ -22,3 +22,56 @@ Utils.prototype.formatDate = function(d, format){
 Utils.prototype.displayError = function(e){
   console.error("Erreur d'accès à l'API", e);
 }
+
+Utils.prototype.notifAlert = function(businessStatus){
+  $.notify(businessStatus.message,
+    {
+      className : businessStatus.success ? "success" : "error",
+      position : "right-bottom"
+    });
+}
+
+Utils.prototype.parsePg = function(username){
+  var result = {
+    nums:"",
+    tbk:"",
+    proms:""
+  };
+  var firstCut = null;
+  var secondCut = null;
+  for (var i=0; i<username.length; i++) {
+    if(firstCut == null){
+      if(username.charAt(i) !== '-'
+      && isNaN(parseInt(username.charAt(i)))){
+        firstCut = i;
+      }
+    }else{
+      if(!isNaN(parseInt(username.charAt(i)))){
+        secondCut = i;
+        break;
+      }
+    }
+  }
+
+  if(firstCut === null){
+    firstCut = 0;
+  }
+  if(secondCut === null){
+    secondCut = 0;
+  }
+  result.nums=username.substring(0, firstCut);
+  result.tbk=username.substring(firstCut, secondCut);
+  result.proms=username.substring(secondCut, username.length);
+
+  return result
+}
+
+Utils.prototype.serializeFormWithUser = function(jForm, username){
+  var serializedForm = $(jForm).serialize();
+  var parsedPg = utils.parsePg(username);
+  serializedForm += "&nums=" + encodeURIComponent(parsedPg.nums);
+  serializedForm += "&tbk=" + encodeURIComponent(parsedPg.tbk);
+  serializedForm += "&proms=" + encodeURIComponent(parsedPg.proms);
+
+  return serializedForm;
+}
