@@ -67,7 +67,10 @@ public class PgService implements IPgService{
 	@Transactional(readOnly = false)
 	public void savePgs(List<Pg> pgs) {
 		for (Pg pg : pgs) {
-			pgDao.save(pg);
+			Pg pgdb = pgDao.getPg(pg.getNums(), pg.getTbk(), pg.getProms());
+			if(pgdb == null){
+				pgDao.save(pg);
+			}
 		}
 	}
 	@Transactional(readOnly = false)

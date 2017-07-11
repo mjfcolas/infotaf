@@ -100,16 +100,16 @@ public class RawTafFile {
 	 * @param key : La clé à considérer (Voir attributs de la classe
 	 * @return Liste d'index
 	 */
-	private List<Integer> getCidsForKey(String key){
-		logger.debug("IN - key: {}", key);
-		List<Integer> result = new ArrayList<Integer>();
-		for (Integer mapKey : columnsMap.keySet()) {
-			if(columnsMap.get(mapKey) != null && columnsMap.get(mapKey).equals(key)){
-				result.add(mapKey);
-			}
-		}
-		return result;
-	}
+//	private List<Integer> getCidsForKey(String key){
+//		logger.debug("IN - key: {}", key);
+//		List<Integer> result = new ArrayList<Integer>();
+//		for (Integer mapKey : columnsMap.keySet()) {
+//			if(columnsMap.get(mapKey) != null && columnsMap.get(mapKey).equals(key)){
+//				result.add(mapKey);
+//			}
+//		}
+//		return result;
+//	}
 	/**
 	 * Récupération des index de colonnes pour plusieurs clés
 	 * @param key : Les clés à considérer (Voir attributs de la classe)

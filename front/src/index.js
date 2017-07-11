@@ -4,6 +4,7 @@ var displayTaf = new DisplayTaf();
 var displayInfos = new DisplayInfos();
 var displayNews = new DisplayNews();
 var account = new Account();
+var restAjax = new RestAjax();
 $(document).ready(function(){
   w3.includeHTML();
   login.init();

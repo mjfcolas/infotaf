@@ -31,7 +31,6 @@ import com.googleToken.GoogleToken;
 import com.infotaf.common.utils.Utils;
 import com.infotaf.restapi.config.AppConfig;
 import com.infotaf.restapi.model.Manip;
-import com.infotaf.restapi.model.Param;
 import com.infotaf.restapi.model.Pg;
 import com.infotaf.restapi.model.PgManip;
 import com.infotaf.restapi.service.GlobalService;
@@ -262,7 +261,6 @@ public class FileWatcher {
 		try {
 			//Purge de la base
 			pgManipService.deletePgManips();
-			pgService.deletePg();
 			manipService.deleteManips();
 			//Parse du fichier
             reader = new CSVReader(new FileReader(fileToProcess));

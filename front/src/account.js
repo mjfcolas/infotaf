@@ -14,14 +14,9 @@ Account.prototype.init = function(){
 Account.prototype.saveAccountInfos = function(){
   var self = this;
   return function(){
-    $.ajax({
-      url:properties.serverUrl+'auth/ChangePassword',
-      beforeSend:function(xhr) {
-        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-        xhr.setRequestHeader('X-Authorization', "Bearer " + localStorage.jwtToken);
-      },
+    restAjax.authAjax({
+      url:'auth/ChangePassword',
       type : 'POST',
-      dataType:"json",
       data:utils.serializeFormWithUser($("#account-form"), login.username),
       success:self.saveAccountInfosSuccess(),
       error:utils.displayError

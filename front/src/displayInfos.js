@@ -7,12 +7,8 @@ DisplayInfos.prototype.init = function(){
 
 DisplayInfos.prototype.loadInfos = function(){
   var self = this;
-  $.ajax({
-    url:properties.serverUrl+'Infos',
-    beforeSend:function(xhr) {
-      xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-    },
-    dataType:"json",
+  restAjax.ajax({
+    url:'Infos',
     success:self.displayInfos,
     error:utils.displayError
   });

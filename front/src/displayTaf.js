@@ -22,9 +22,8 @@ DisplayTaf.prototype.init = function(){
 DisplayTaf.prototype.loadTaf = function(){
   var self = this;
   return function(){
-    $.ajax({
-      url:properties.serverUrl+'Pg',
-      dataType:"json",
+    restAjax.ajax({
+      url:'Pg',
       data:{
         pg:$("#nums-pg").val()
       },
@@ -101,28 +100,20 @@ DisplayTaf.prototype.enableEdit = function(){
 }
 
 DisplayTaf.prototype.disableEdit = function(){
-
   $("#save-button").removeAttr("disabled");
   this.displaySaveAndModify(false);
   this.renderKifekoi();
-
 }
 
 DisplayTaf.prototype.saveKifekoi = function(){
   var self = this;
   return function(){
     $("#save-button").prop("disabled", "true");
-    $.ajax({
-      url:properties.serverUrl+'auth/SaveKifekoi',
-      dataType:"json",
+    restAjax.authAjax({
+      url:'auth/SaveKifekoi',
       type:'POST',
-      beforeSend:function(xhr) {
-        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-        xhr.setRequestHeader('X-Authorization', "Bearer " + localStorage.jwtToken);
-      },
       data:utils.serializeFormWithUser($("#kifekoi-form"), login.username),
-      success:self.saveKifekoiSuccess(),
-      error:utils.displayError
+      success:self.saveKifekoiSuccess()
     });
   }
 }
@@ -139,7 +130,6 @@ DisplayTaf.prototype.saveKifekoiSuccess = function(){
     utils.notifAlert(businessStatus);
     self.disableEdit();
   }
-
 }
 
 DisplayTaf.prototype.renderPGConsos = function(data){

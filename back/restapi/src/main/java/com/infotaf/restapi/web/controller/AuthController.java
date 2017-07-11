@@ -15,6 +15,7 @@ public class AuthController {
 	
 	@RequestMapping("auth/username")
 	public UserContext CurrentUser(JwtAuthenticationToken principal){
+		logger.debug("IN");
 		return (UserContext) principal.getPrincipal();
 	}
 

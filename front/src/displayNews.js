@@ -7,12 +7,8 @@ DisplayNews.prototype.init = function(){
 
 DisplayNews.prototype.loadNews = function(){
   var self = this;
-  $.ajax({
-    url:properties.serverUrl+'News',
-    beforeSend:function(xhr) {
-      xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-    }, 
-    dataType:"json",
+  restAjax.ajax({
+    url:'News',
     success:self.displayNews,
     error:utils.displayError
   });

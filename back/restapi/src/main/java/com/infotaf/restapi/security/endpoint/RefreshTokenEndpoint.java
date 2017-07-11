@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.infotaf.restapi.security.model.User;
+import com.infotaf.restapi.config.AppConfig;
 import com.infotaf.restapi.security.auth.jwt.extractor.TokenExtractor;
 import com.infotaf.restapi.security.auth.jwt.verifier.TokenVerifier;
 import com.infotaf.restapi.security.config.WebSecurityConfig;
@@ -31,6 +32,7 @@ import com.infotaf.restapi.security.model.token.JwtToken;
 import com.infotaf.restapi.security.model.token.JwtTokenFactory;
 import com.infotaf.restapi.security.model.token.RawAccessJwtToken;
 import com.infotaf.restapi.security.model.token.RefreshToken;
+import com.infotaf.restapi.security.service.DatabaseUserService;
 
 /**
  * RefreshTokenEndpoint
@@ -41,34 +43,33 @@ import com.infotaf.restapi.security.model.token.RefreshToken;
  */
 @RestController
 public class RefreshTokenEndpoint {
-//    @Autowired private JwtTokenFactory tokenFactory;
-//    @Autowired private JwtSettings jwtSettings;
-//    @Autowired private UserService userService;
-//    @Autowired private TokenVerifier tokenVerifier;
-//    @Autowired @Qualifier("jwtHeaderTokenExtractor") private TokenExtractor tokenExtractor;
-//    
-//    @RequestMapping(value="/api/auth/token", method=RequestMethod.GET, produces={ MediaType.APPLICATION_JSON_VALUE })
-//    public @ResponseBody JwtToken refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-//        String tokenPayload = tokenExtractor.extract(request.getHeader(WebSecurityConfig.JWT_TOKEN_HEADER_PARAM));
-//        
-//        RawAccessJwtToken rawToken = new RawAccessJwtToken(tokenPayload);
-//        RefreshToken refreshToken = RefreshToken.create(rawToken, jwtSettings.getTokenSigningKey()).orElseThrow(() -> new InvalidJwtToken());
-//
-//        String jti = refreshToken.getJti();
-//        if (!tokenVerifier.verify(jti)) {
-//            throw new InvalidJwtToken();
-//        }
-//
-//        String subject = refreshToken.getSubject();
-//        User user = userService.getByUsername(subject).orElseThrow(() -> new UsernameNotFoundException("User not found: " + subject));
-//
-//        if (user.getRoles() == null) throw new InsufficientAuthenticationException("User has no roles assigned");
-//        List<GrantedAuthority> authorities = user.getRoles().stream()
-//                .map(authority -> new SimpleGrantedAuthority(authority.getRole().authority()))
-//                .collect(Collectors.toList());
-//
-//        UserContext userContext = UserContext.create(user.getUsername(), authorities);
-//
-//        return tokenFactory.createAccessJwtToken(userContext);
-//    }
+    @Autowired private JwtTokenFactory tokenFactory;
+    @Autowired private DatabaseUserService userService;
+    @Autowired private TokenVerifier tokenVerifier;
+    @Autowired @Qualifier("jwtHeaderTokenExtractor") private TokenExtractor tokenExtractor;
+    
+    @RequestMapping(value="/auth/token", method=RequestMethod.GET, produces={ MediaType.APPLICATION_JSON_VALUE })
+    public @ResponseBody JwtToken refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        String tokenPayload = tokenExtractor.extract(request.getHeader(WebSecurityConfig.JWT_TOKEN_HEADER_PARAM));
+        
+        RawAccessJwtToken rawToken = new RawAccessJwtToken(tokenPayload);
+        RefreshToken refreshToken = RefreshToken.create(rawToken, AppConfig.prop.getProperty("security.tokenSigningKey")).orElseThrow(() -> new InvalidJwtToken());
+
+        String jti = refreshToken.getJti();
+        if (!tokenVerifier.verify(jti)) {
+            throw new InvalidJwtToken();
+        }
+
+        String subject = refreshToken.getSubject();
+        User user = userService.getByUsername(subject).orElseThrow(() -> new UsernameNotFoundException("User not found: " + subject));
+
+        if (user.getRoles() == null) throw new InsufficientAuthenticationException("User has no roles assigned");
+        List<GrantedAuthority> authorities = user.getRoles().stream()
+                .map(authority -> new SimpleGrantedAuthority(authority.getRole().authority()))
+                .collect(Collectors.toList());
+
+        UserContext userContext = UserContext.create(user.getUsername(), authorities);
+
+        return tokenFactory.createAccessJwtToken(userContext);
+    }
 }

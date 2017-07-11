@@ -41,7 +41,6 @@ public class GoogleToken{
 	
 	public String getAccessToken() throws Exception {
 	    if(System.currentTimeMillis() > tokenExpires) {
-	    	logger.info("Récupération d'un nouveau token");
 	    	//Réinitialisation du token
 	    	accessToken = null;
 	        try {

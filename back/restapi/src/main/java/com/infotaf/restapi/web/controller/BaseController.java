@@ -1,6 +1,7 @@
 package com.infotaf.restapi.web.controller;
 
 import java.text.ParseException;
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 
@@ -39,6 +40,21 @@ public class BaseController {
 	protected ParamService paramService;
 	@Autowired
 	protected NewsService newsService;
+	
+	/**
+	 * Retourne le timestamp du serveur
+	 * @return
+	 */
+	@RequestMapping("Timestamp")
+	public BusinessStatus GetTimestamp(){
+		logger.debug("IN");
+		Long timestamp = System.currentTimeMillis()/1000;
+		
+		BusinessStatus result = new BusinessStatus();
+		result.setSuccess(true);
+		result.setValue(timestamp.toString());
+		return result;
+	}
 	
 	/**
 	 * Récupération d'un pg avec toutes les informations liées aux manips auxquelles il a participé

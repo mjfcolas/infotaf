@@ -12,6 +12,7 @@
   <script src="lib/w3.js"></script>
   <script src="properties.js"></script>
   <script src="utils.js"></script>
+  <script src="restAjax.js"></script>
   <script src="login.js"></script>
   <script src="tabs.js"></script>
   <script src="displayTaf.js"></script>
@@ -35,7 +36,7 @@
         <div class="float-right inline-block">
           <div>Mise à jour : <span id="update-date"></span></div>
           <div><span id="login-info"></span></div>
-          <span style="display:none" class="logged-out">
+          <span class="logged-out">
             <input type="button" value="Login" class="btn btn-primary" id="open-login-button" data-toggle="modal" data-target="#login-modal"/>
           </span>
           <span style="display:none" class="logged-in">

@@ -21,7 +21,8 @@ public class SkipPathRequestMatcher implements RequestMatcher {
     private OrRequestMatcher matchers;
     private RequestMatcher processingMatcher;
     
-    public SkipPathRequestMatcher(List<String> pathsToSkip, String processingPath) {
+    @SuppressWarnings("deprecation")
+	public SkipPathRequestMatcher(List<String> pathsToSkip, String processingPath) {
         Assert.notNull(pathsToSkip);
         List<RequestMatcher> m = pathsToSkip.stream().map(path -> new AntPathRequestMatcher(path)).collect(Collectors.toList());
         matchers = new OrRequestMatcher(m);

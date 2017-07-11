@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.infotaf.restapi</groupId>
   <artifactId>restapi</artifactId>
-  <version>0.0.5</version>
+  <version>0.0.6</version>
   
   <properties>
       <hibernate.version>5.0.11.Final</hibernate.version>
