@@ -10,4 +10,9 @@ public interface INewsService{
 	 * @return
 	 */
 	public List<News> getNews();
+	/**
+	 * Sauvegarde d'une news après lui avoir ajouté la date actuelle
+	 * @param news news à sauvegarder sans la date
+	 */
+	void saveNews(News news);
 }

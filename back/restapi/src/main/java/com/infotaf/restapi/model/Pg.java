@@ -38,7 +38,15 @@ public class Pg{
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "pg")
 	protected List<PgManip> pgManips;
 	
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "pg")
+	protected List<Role> roles;	
 		
+	public List<Role> getRoles() {
+		return roles;
+	}
+	public void setRoles(List<Role> roles) {
+		this.roles = roles;
+	}
 	public int getId() {
 		return id;
 	}

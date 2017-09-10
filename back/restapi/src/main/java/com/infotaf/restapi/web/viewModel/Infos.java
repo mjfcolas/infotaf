@@ -8,7 +8,7 @@ import java.util.Date;
  * @author emmanuel
  *
  */
-public class Infos{
+public class Infos extends Serializable{
 		
 	protected Date date;
 

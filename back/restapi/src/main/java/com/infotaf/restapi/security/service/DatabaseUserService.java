@@ -1,9 +1,9 @@
 package com.infotaf.restapi.security.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,9 +15,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.infotaf.common.exceptions.PgFormatException;
 import com.infotaf.common.utils.Utils;
 import com.infotaf.restapi.data.PgDao;
+import com.infotaf.restapi.data.RoleDao;
 import com.infotaf.restapi.model.Pg;
+import com.infotaf.restapi.model.Role;
+import com.infotaf.restapi.security.model.RoleEnum;
 import com.infotaf.restapi.security.model.User;
-import com.infotaf.restapi.security.model.UserRole;
 
 /**
  * Mock implementation.
@@ -33,6 +35,8 @@ public class DatabaseUserService{
 	
 	@Autowired
     protected PgDao pgDao;
+	@Autowired
+    protected RoleDao roleDao;
 	
     @Autowired
     public DatabaseUserService() {
@@ -42,8 +46,6 @@ public class DatabaseUserService{
     public Optional<User> getByUsername(String username) {
     	logger.debug("IN - username: {}", username);
     	
-    	List<UserRole> genericRoles = new ArrayList<UserRole>();
-    	genericRoles.add(new UserRole());
     	
 		//Formattage de la clé unique sur laquelle le filtre va être effectué à partir du paramètre pgId
 		Map<String, String> parsedPg;
@@ -54,6 +56,18 @@ public class DatabaseUserService{
 		}
     	
 		Pg pg = pgDao.getPg(parsedPg.get("nums"), parsedPg.get("tbk"), parsedPg.get("proms"));
+		
+		List<Role> genericRoles = roleDao.getRole(pg);
+		List<RoleEnum> filteredRoles = genericRoles.stream()
+				.map(x -> x.getRole())
+				.filter(x -> x == RoleEnum.USR)
+				.collect(Collectors.toList());
+		if(filteredRoles.size() < 1){
+			Role usrRole = new Role();
+			usrRole.setPg(pg);
+			usrRole.setRole(RoleEnum.USR);
+			genericRoles.add(usrRole);
+		}
     	
 		//Initialisation du mot de passe au nom d'utilisateur si inexistant
 		String password = pg.getPassword();

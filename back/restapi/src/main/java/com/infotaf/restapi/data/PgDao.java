@@ -1,5 +1,7 @@
 package com.infotaf.restapi.data;
 
+import java.util.List;
+
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -9,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import com.infotaf.restapi.model.Pg;
 
 @Repository
+@SuppressWarnings("unchecked")
 public class PgDao extends GenericDao<Pg> implements IPgDao{
 	
 	private static final Logger logger = LoggerFactory.getLogger(PgDao.class);
@@ -25,6 +28,18 @@ public class PgDao extends GenericDao<Pg> implements IPgDao{
 				.add(whereTbk)
 				.add(whereProms)
 				.uniqueResult();
+		return pg;
+	}
+	
+	public List<Pg> getPgsByRole(String role){
+		logger.debug("IN - role: {}", role);
+		Criterion whereRole = Restrictions.eq("role.role", role);
+		
+		List<Pg> pg = getSession()
+				.createCriteria(Pg.class)
+				.createAlias("roles", "role")
+				.add(whereRole)
+				.list();
 		return pg;
 	}
 	

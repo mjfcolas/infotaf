@@ -4,6 +4,14 @@ function RestAjax(){
 
 //Appel ajax classique incorporant les headers de l'authentification
 RestAjax.prototype.authAjax = function(params){
+  if(!localStorage.jwtToken || localStorage.jwtToken == "null" || localStorage.jwtToken == "undefined"){
+    var businessStatus = {
+      success:false,
+      message:messages.notConnected
+    }
+    utils.notifAlert(businessStatus);
+    return;
+  }
   $.ajax({
     url:properties.serverUrl+params.url,
     dataType:"json",

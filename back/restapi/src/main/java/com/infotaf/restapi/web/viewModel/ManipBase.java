@@ -13,7 +13,7 @@ import com.infotaf.restapi.model.PgManip;
  * @author emmanuel
  *
  */
-public class ManipBase{
+public class ManipBase extends Serializable{
 	
 	private static final Logger logger = LoggerFactory.getLogger(ManipBase.class);
 	

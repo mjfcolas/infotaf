@@ -5,6 +5,7 @@ var displayInfos = new DisplayInfos();
 var displayNews = new DisplayNews();
 var account = new Account();
 var restAjax = new RestAjax();
+var administration = new Administration();
 $(document).ready(function(){
   w3.includeHTML();
   login.init();
@@ -12,4 +13,5 @@ $(document).ready(function(){
   displayInfos.init();
   displayNews.init();
   account.init();
+  administration.init();
 });

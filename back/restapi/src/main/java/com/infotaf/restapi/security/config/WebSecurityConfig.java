@@ -17,7 +17,8 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.infotaf.restapi.CustomCorsFilter;
+import com.infotaf.restapi.filters.CustomCorsFilter;
+import com.infotaf.restapi.filters.XSSFilter;
 import com.infotaf.restapi.security.RestAuthenticationEntryPoint;
 import com.infotaf.restapi.security.auth.ajax.AjaxAuthenticationProvider;
 import com.infotaf.restapi.security.auth.ajax.AjaxLoginProcessingFilter;
@@ -99,6 +100,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .authorizeRequests()
                 .antMatchers(TOKEN_BASED_AUTH_ENTRY_POINT).authenticated() // Protected API End-points
         .and()
+        	.addFilterBefore(new XSSFilter(), UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(new CustomCorsFilter(), UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(buildAjaxLoginProcessingFilter(), UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(buildJwtTokenAuthenticationProcessingFilter(), UsernamePasswordAuthenticationFilter.class);

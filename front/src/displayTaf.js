@@ -22,8 +22,8 @@ DisplayTaf.prototype.init = function(){
 DisplayTaf.prototype.loadTaf = function(){
   var self = this;
   return function(){
-    restAjax.ajax({
-      url:'Pg',
+    restAjax.authAjax({
+      url:'auth/Pg',
       data:{
         pg:$("#nums-pg").val()
       },
@@ -39,9 +39,11 @@ DisplayTaf.prototype.renderInfos = function(){
     if(!data || !data.nums){
       $(".result").hide();
       $(".no-result").show();
+      $(".am-trads").show();
     }else{
       $(".result").css("display", "inline");
       $(".no-result").hide();
+      $(".am-trads").hide();
 
       self.currentUser = data.nums + data.tbk + data.proms
       self.displayGlobalPgInfos(data);
@@ -76,6 +78,7 @@ DisplayTaf.prototype.displaySaveAndModify = function(enableEdit){
   if(!this.saveMode || !enableEdit){
     $("#save-button").hide();
   }else{
+    $("#save-button").removeAttr("disabled");
     $("#save-button").show();
   }
   if(!enableEdit && login.username && this.currentUser && login.username.toUpperCase() === this.currentUser.toUpperCase() ){
@@ -113,7 +116,8 @@ DisplayTaf.prototype.saveKifekoi = function(){
       url:'auth/SaveKifekoi',
       type:'POST',
       data:utils.serializeFormWithUser($("#kifekoi-form"), login.username),
-      success:self.saveKifekoiSuccess()
+      success:self.saveKifekoiSuccess(),
+      error:utils.displayErrorAndEnableButton("#save-button")
     });
   }
 }
@@ -121,12 +125,12 @@ DisplayTaf.prototype.saveKifekoi = function(){
 DisplayTaf.prototype.saveKifekoiSuccess = function(){
   var self = this;
   return function(businessStatus){
-
-    self.kifekoi.workplace = $("#pg-place input").val();
-    self.kifekoi.address = $("#pg-address input").val();
-    self.kifekoi.work = $("#pg-job input").val();
-    self.kifekoi.workDetails = $("#pg-job-details-textarea").val();
-
+    if(businessStatus.success){
+      self.kifekoi.workplace = $("#pg-place input").val();
+      self.kifekoi.address = $("#pg-address input").val();
+      self.kifekoi.work = $("#pg-job input").val();
+      self.kifekoi.workDetails = $("#pg-job-details-textarea").val();
+    }
     utils.notifAlert(businessStatus);
     self.disableEdit();
   }

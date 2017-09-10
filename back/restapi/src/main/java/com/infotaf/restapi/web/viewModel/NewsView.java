@@ -12,7 +12,7 @@ import com.infotaf.restapi.model.News;
  * @author emmanuel
  *
  */
-public class NewsView{
+public class NewsView extends Serializable{
 	
 	private static final Logger logger = LoggerFactory.getLogger(ManipBase.class);
 	

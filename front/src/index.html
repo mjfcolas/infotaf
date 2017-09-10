@@ -11,6 +11,7 @@
   <script src="lib/notify.min.js"></script>
   <script src="lib/w3.js"></script>
   <script src="properties.js"></script>
+  <script src="messages.js"></script>
   <script src="utils.js"></script>
   <script src="restAjax.js"></script>
   <script src="login.js"></script>
@@ -19,6 +20,7 @@
   <script src="displayInfos.js"></script>
   <script src="displayNews.js"></script>
   <script src="account.js"></script>
+  <script src="administration.js"></script>
   <script src="index.js"></script>
 </head>
 <body>
@@ -26,12 +28,17 @@
   <!-- Popins-->
   <div w3-include-html="loginModal.html"></div>
   <div w3-include-html="accountModal.html"></div>
+  <div w3-include-html="createNews.html"></div>
+  <div w3-include-html="administrationModal.html"></div>
 
   <div class="container">
     <div class="row">
       <div id="header" class="col-md-12">
-        <div class="inline-block">
-          <h1>TAF Li212</h1>
+        <div class="inline-block" id="site-title">
+          <h1>
+            <img id="AM-img" src="img/AM.svg"/>
+            TAF Li212
+          </h1>
         </div>
         <div class="float-right inline-block">
           <div>Mise à jour : <span id="update-date"></span></div>
@@ -42,6 +49,7 @@
           <span style="display:none" class="logged-in">
             <input type="button" value="Logout" class="btn btn-primary" id="logout-button"/>
             <input type="button" value="Compte" class="btn btn-primary" id="account-button" data-toggle="modal" data-target="#account-modal"/>
+            <input type="button" value="Administration" class="btn btn-primary ROLE_ADM" id="admin-button" data-toggle="modal" data-target="#administration-modal"/>
           </span>
         </div>
       </div>
@@ -54,7 +62,7 @@
               <legend>PG</legend>
               <form id="form">
                 <label for="nums-pg">Num's</label>
-                <input type="text" id="nums-pg" placeholder="80Li212"/>
+                <input type="text" id="nums-pg" class="small-input" placeholder="80Li212"/>
                 <input type="button" value="Go!" class="btn btn-primary" id="send-button"/>
               </form>
               <div id="pg-infos">
@@ -72,6 +80,9 @@
               </div>
             </fieldset>
           </div>
+        </div>
+        <div class="am-trads">
+          <img id="logo-img" src="img/logo-li212.jpg"/>
         </div>
         <div class="result">
           <div class="row">
@@ -151,12 +162,14 @@
         </div>
       </div>
       <div class="col-md-4">
-        <div id="information">
-          <fieldset>
-            <legend>Informations</legend>
-            <div id="news">
-            </div>
-          </fieldset>
+        <fieldset>
+          <legend>Informations</legend>
+          <div id="admin-news" class="ROLE_ADM">
+            <button type="button" id="new-news-button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#create-news-modal">Nouveau billet</button>
+          </div>
+          <div id="news">
+          </div>
+        </fieldset>
         </div>
       </div>
     </div>

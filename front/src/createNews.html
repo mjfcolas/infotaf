@@ -1,0 +1,38 @@
+<div id="create-news-modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Ecrire un billet</h4>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid">
+          <form id="news-form">
+            <div class="row">
+              <div class="col-md-2">
+                <label for="news-form-title-label">Titre</label>
+              </div>
+              <div class="col-md-10">
+                <input type="text" name="title" id="news-form-title-input"/>
+              </div>
+            </div>
+            <div class="row row-form">
+              <div class="col-md-2">
+                <label for="news-form-content-label">Contenu</label>
+              </div>
+              <div class="col-md-10">
+                <textarea id="news-form-content-textarea" class="big-textarea" name="content" maxlength="2000"></textarea>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" id="create-news-button">Sauvegarder</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
+      </div>
+    </div>
+
+  </div>
+</div>

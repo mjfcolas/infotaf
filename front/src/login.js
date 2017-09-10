@@ -4,6 +4,8 @@ function Login(){
   this.roles = [];
   this.expiration = null;
   this.refreshExpiration = null;
+
+  this.availableRoles = ["ROLE_ADM", "ROLE_USR"];
 }
 
 Login.prototype.init = function(){
@@ -75,7 +77,6 @@ Login.prototype.refresh = function(){
 Login.prototype.checkRefresh = function(){
   var self = this;
   $(document).one("got-server-timestamp", function(e, ts){
-    console.log("TS SERVEUR", ts, "TS EXP", self.expiration);
     if(self.expiration < ts + 60 && self.expiration > ts){//Si l'expiration du jeton arrive dans moins d'une minute, mais n'est pas passé on le refresh
       self.refresh();
     }else if(self.expiration < ts){//Déconnexion si l'expiration du jeton a été atteinte
@@ -166,12 +167,12 @@ Login.prototype.retrieveUsername = function(){
 Login.prototype.retrieveUsernameCallback = function(logout){
   var self=this;
   return function(data){
-    self.manageLoggedUser(logout, data.username);
+    self.manageLoggedUser(logout, data);
   }
 }
 
-Login.prototype.manageLoggedUser = function(logout, username){
-  if(logout || !username){
+Login.prototype.manageLoggedUser = function(logout, userAndRoles){
+  if(logout || !userAndRoles || !userAndRoles.username){
     localStorage.setItem('jwtToken', null);
     localStorage.setItem('jwtRefreshToken', null);
     this.loggedIn = false;
@@ -182,12 +183,32 @@ Login.prototype.manageLoggedUser = function(logout, username){
     $("#login-info").text("Non connecté");
     $(".logged-out").show();
     $(".logged-in").hide();
+
+    $(".result").hide();
+    $(".am-trads").show();
   }else{
     this.loggedIn = true;
-    this.username = username;
+    this.username = userAndRoles.username;
+    this.roles.length = 0;
+    if(userAndRoles.authorities){
+      for(var i = 0; i < userAndRoles.authorities.length; i++){
+        this.roles.push(userAndRoles.authorities[i].authority);
+      }
+    }
     $("#login-info").text("Connecté : " + login.username);
     $(".logged-out").hide();
     $(".logged-in").show();
   }
+  this.manageDomElements();
   displayTaf.renderKifekoi();
+}
+
+Login.prototype.manageDomElements = function(){
+  for(var i = 0; i < this.availableRoles.length; i++){
+    if(this.roles.indexOf(this.availableRoles[i]) === -1){
+      $("."+this.availableRoles[i]).removeClass("granted");
+    }else{
+      $("."+this.availableRoles[i]).addClass("granted");
+    }
+  }
 }

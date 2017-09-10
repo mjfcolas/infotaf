@@ -1,5 +1,6 @@
 package com.infotaf.restapi.service;
 
+import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -23,5 +24,12 @@ public class NewsService implements INewsService{
     public List<News> getNews(){
     	logger.debug("IN");
     	return newsDao.findAll();
+	}
+    
+    @Transactional(readOnly = false)
+    public void saveNews(News news){
+    	logger.debug("IN");
+    	news.setDate(new Date());
+    	newsDao.save(news);
 	}
 }

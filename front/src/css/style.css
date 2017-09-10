@@ -40,10 +40,12 @@
   vertical-align: center;
 }
 
-#nums-pg{
+.small-input{
   width:75px;
 }
-
+#new-news-button{
+  align:center
+}
 .result{
   display: none;
 }
@@ -89,7 +91,31 @@
 }
 .kifekoi-textarea{
     width:100%;
-    resize: none;
+}
+
+.big-textarea{
+  width:100%;
+  height:150px;
+}
+
+.row-form{
+  padding-top:15px;
+}
+#site-title{
+  width:50%;
+}
+#AM-img{
+  width:10%;
+  float:left;
+}
+#logo-img{
+  width:50%;
+  display: block;
+  margin: auto;
+}
+
+textarea{
+  resize:none;
 }
 
 body {
@@ -101,4 +127,8 @@ body {
 
 form{
   margin:10px;
+}
+
+.ROLE_ADM:not(.granted), .ROLE_USR:not(.granted){
+  display:none;
 }

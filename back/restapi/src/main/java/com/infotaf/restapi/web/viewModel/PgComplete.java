@@ -12,14 +12,8 @@ import com.infotaf.restapi.model.PgManip;
  * @author emmanuel
  *
  */
-public class PgComplete{
+public class PgComplete extends PgBase{
 	
-	protected int id;
-	protected String nums;
-	protected String tbk;
-	protected String proms;
-	protected String firstName;
-	protected String lastName;
 	protected String workplace;
 	protected String address;
 	protected String work;
@@ -34,12 +28,9 @@ public class PgComplete{
 	}
 	
 	public PgComplete(Pg pg, List<PgManip> manips){
-		this.id = pg.getId();
-		this.nums = pg.getNums();
-		this.tbk = pg.getTbk();
-		this.proms = pg.getProms();
-		this.firstName = pg.getFirstName();
-		this.lastName = pg.getLastName();
+
+		super(pg);
+		
 		this.workplace = pg.getWorkplace();
 		this.address = pg.getAddress();
 		this.work = pg.getWork();
@@ -54,54 +45,6 @@ public class PgComplete{
 				}
 			}
 		}
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public String getNums() {
-		return nums;
-	}
-
-	public void setNums(String nums) {
-		this.nums = nums;
-	}
-
-	public String getTbk() {
-		return tbk;
-	}
-
-	public void setTbk(String tbk) {
-		this.tbk = tbk;
-	}
-
-	public String getProms() {
-		return proms;
-	}
-
-	public void setProms(String proms) {
-		this.proms = proms;
-	}
-
-	public String getFirstName() {
-		return firstName;
-	}
-
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-
-	public String getLastName() {
-		return lastName;
-	}
-
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
 	}
 
 	public String getWorkplace() {

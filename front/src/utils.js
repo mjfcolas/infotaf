@@ -23,6 +23,19 @@ Utils.prototype.displayError = function(e){
   console.error("Erreur d'accès à l'API", e);
 }
 
+Utils.prototype.displayErrorAndEnableButton = function(buttonToEnable){
+  var self = this;
+  return function(e){
+    $(buttonToEnable).removeAttr("disabled");
+    var businessStatus = {
+      success:false,
+      message:messages.unknownError
+    }
+    self.notifAlert(businessStatus);
+    console.error("Erreur d'accès à l'API", e);
+  }
+}
+
 Utils.prototype.notifAlert = function(businessStatus){
   $.notify(businessStatus.message,
     {
@@ -67,7 +80,10 @@ Utils.prototype.parsePg = function(username){
 }
 
 Utils.prototype.serializeFormWithUser = function(jForm, username){
-  var serializedForm = $(jForm).serialize();
+  var serializedForm = "";
+  if(jForm){
+    serializedForm = $(jForm).serialize();
+  }
   var parsedPg = utils.parsePg(username);
   serializedForm += "&nums=" + encodeURIComponent(parsedPg.nums);
   serializedForm += "&tbk=" + encodeURIComponent(parsedPg.tbk);

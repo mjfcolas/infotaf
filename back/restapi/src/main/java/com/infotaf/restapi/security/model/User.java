@@ -2,17 +2,19 @@ package com.infotaf.restapi.security.model;
 
 import java.util.List;
 
+import com.infotaf.restapi.model.Role;
+
 public class User {
 
     private String username;
     
     private String password;
     
-    private List<UserRole> roles;
+    private List<Role> roles;
     
     public User() { }
     
-    public User(String username, String password, List<UserRole> roles) {
+    public User(String username, String password, List<Role> roles) {
         this.username = username;
         this.password = password;
         this.roles = roles;
@@ -26,7 +28,7 @@ public class User {
         return password;
     }
 
-    public List<UserRole> getRoles() {
+    public List<Role> getRoles() {
         return roles;
     }
 }

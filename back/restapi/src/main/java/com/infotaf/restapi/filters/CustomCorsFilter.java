@@ -1,4 +1,4 @@
-package com.infotaf.restapi;
+package com.infotaf.restapi.filters;
 
 import java.util.Arrays;
 

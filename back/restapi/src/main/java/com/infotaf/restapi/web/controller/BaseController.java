@@ -1,7 +1,7 @@
 package com.infotaf.restapi.web.controller;
 
 import java.text.ParseException;
-import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.infotaf.common.exceptions.BusinessException;
+import com.infotaf.common.exceptions.PgFormatException;
 import com.infotaf.common.exceptions.UnauthorizedUserException;
 import com.infotaf.restapi.config.AppConfig;
 import com.infotaf.restapi.model.BusinessStatus;
@@ -19,11 +21,14 @@ import com.infotaf.restapi.model.News;
 import com.infotaf.restapi.model.Pg;
 import com.infotaf.restapi.security.CheckUserAuthorize;
 import com.infotaf.restapi.security.auth.JwtAuthenticationToken;
+import com.infotaf.restapi.security.model.RoleEnum;
+import com.infotaf.restapi.security.model.UserContext;
 import com.infotaf.restapi.service.ManipService;
 import com.infotaf.restapi.service.NewsService;
 import com.infotaf.restapi.service.ParamService;
 import com.infotaf.restapi.service.PgService;
 import com.infotaf.restapi.web.viewModel.Infos;
+import com.infotaf.restapi.web.viewModel.PgBase;
 import com.infotaf.restapi.web.viewModel.PgComplete;
 
 @RestController
@@ -61,7 +66,7 @@ public class BaseController {
 	 * @param pg
 	 * @return
 	 */
-	@RequestMapping("Pg")
+	@RequestMapping("auth/Pg")
 	public PgComplete GetPg(String pg){
 		logger.debug("IN - pg: {}", pg);
 
@@ -104,6 +109,125 @@ public class BaseController {
 	}
 	
 	/**
+	 * Création d'une news
+	 * @param principal utilisateur connecté
+	 * @param news news pasée
+	 * @return Résultat de l'action
+	 */
+	@RequestMapping("auth/CreateNews")
+	public BusinessStatus CreateNews(JwtAuthenticationToken principal, News news){
+		logger.debug("IN");
+		BusinessStatus result = new BusinessStatus();
+
+		try{
+			CheckUserAuthorize.checkUser(principal, RoleEnum.ADM);
+			
+			newsService.saveNews(news);
+			
+			result.setSuccess(true);
+			result.setMessage(AppConfig.messages.getProperty("notif.success"));
+		}catch(UnauthorizedUserException e){
+			result.setSuccess(false);
+			result.setMessage(AppConfig.messages.getProperty("notif.exception.unauthorizedUser"));
+			
+		}catch(Exception e){
+			result.setSuccess(false);
+			result.setMessage(AppConfig.messages.getProperty("notif.exception.unknownError"));
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * Récupération de la liste des admins
+	 * @param principal utilisateur connecté
+	 * @return liste des admins
+	 */
+	@RequestMapping("auth/getAdmins")
+	public List<PgBase> GetAdmins(JwtAuthenticationToken principal){
+		logger.debug("IN");
+		try{
+			CheckUserAuthorize.checkUser(principal, RoleEnum.ADM);
+			return pgService.getPgsByRole(RoleEnum.ADM.name());
+			
+		}catch(UnauthorizedUserException e){
+			return new ArrayList<PgBase>();
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			return new ArrayList<PgBase>();
+		}
+	}
+	
+	/**
+	 * Récupération de la liste des admins
+	 * @param principal utilisateur connecté
+	 * @param pg PG à ajouter en tant qu'admin
+	 * @return Résultat de l'opération
+	 */
+	@RequestMapping("auth/addAdmin")
+	public BusinessStatus addAdmin(JwtAuthenticationToken principal, String pg){
+		logger.debug("IN - pg: {}", pg);
+		BusinessStatus result = new BusinessStatus();
+
+		try{
+			CheckUserAuthorize.checkUser(principal, RoleEnum.ADM);
+			PgBase pgwWithRoleAdded = pgService.addRoleToPg(pg, RoleEnum.ADM);
+			
+			result.setObject(pgwWithRoleAdded);
+			result.setSuccess(true);
+			result.setMessage(AppConfig.messages.getProperty("notif.success"));			
+		}catch(UnauthorizedUserException e){
+			result.setSuccess(false);
+			result.setMessage(AppConfig.messages.getProperty("notif.exception.unauthorizedUser"));
+		}catch(PgFormatException e){
+			result.setSuccess(false);
+			result.setMessage(AppConfig.messages.getProperty("notif.exception.badPgFormat"));
+		}catch(BusinessException e){
+			result.setSuccess(false);
+			result.setMessage(e.getMessage());
+		}catch(Exception e){
+			e.printStackTrace();
+			result.setSuccess(false);
+			result.setMessage(AppConfig.messages.getProperty("notif.exception.unknownError"));
+		}
+		return result;
+	}
+	
+	/**
+	 * Récupération de la liste des admins
+	 * @param principal utilisateur connecté
+	 * @param pgId id de l'utilisateur à supprimer
+	 * @return liste des admins
+	 */
+	@RequestMapping("auth/deleteAdmin")
+	public BusinessStatus deleteAdmin(JwtAuthenticationToken principal, int pgId){
+		logger.debug("IN");
+		BusinessStatus result = new BusinessStatus();
+
+		try{
+			CheckUserAuthorize.checkUser(principal, RoleEnum.ADM);
+			String sender = ((UserContext)principal.getPrincipal()).getUsername();
+			pgService.deleteRoleFromPg(pgId, sender, RoleEnum.ADM);
+			
+			result.setSuccess(true);
+			result.setMessage(AppConfig.messages.getProperty("notif.success"));			
+		}catch(UnauthorizedUserException e){
+			result.setSuccess(false);
+			result.setMessage(AppConfig.messages.getProperty("notif.exception.unauthorizedUser"));
+			
+		}catch(BusinessException e){
+			result.setSuccess(false);
+			result.setMessage(e.getMessage());
+		}catch(Exception e){
+			e.printStackTrace();
+			result.setSuccess(false);
+			result.setMessage(AppConfig.messages.getProperty("notif.exception.unknownError"));
+		}
+		return result;
+	}
+	
+	/**
 	 * Sauvegarde des infos du kifekoi
 	 * @return
 	 */
@@ -121,7 +245,8 @@ public class BaseController {
 			result.setSuccess(false);
 			result.setMessage(AppConfig.messages.getProperty("notif.exception.unauthorizedUser"));
 			
-		}catch(Exception e){
+		}
+		catch(Exception e){
 			result.setSuccess(false);
 			result.setMessage(AppConfig.messages.getProperty("notif.exception.unknownError"));
 		}
