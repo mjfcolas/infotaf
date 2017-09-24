@@ -13,6 +13,12 @@ public interface INewsService{
 	/**
 	 * Sauvegarde d'une news après lui avoir ajouté la date actuelle
 	 * @param news news à sauvegarder sans la date
+	 * @return L'id de l'objet sauvegardé
 	 */
-	void saveNews(News news);
+	public int saveNews(News news);
+	/**
+	 * Suppression d'une news
+	 * @param newsId ID de la news
+	 */
+	public void deleteNews(int newsId);
 }

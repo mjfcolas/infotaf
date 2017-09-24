@@ -21,7 +21,7 @@ public class NewsView extends Serializable{
 	protected String content;
 	protected Date date;
 	
-	NewsView(News news){
+	public NewsView(News news){
 		logger.debug("IN - news.id: {}", news.getId());
 		this.id = news.getId();
 		this.title = news.getTitle();

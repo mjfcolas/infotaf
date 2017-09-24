@@ -26,6 +26,11 @@ public interface IGenericDao<E>{
 	 */
 	public void deleteAll();
 	/**
+	 * Suppression d'un élément d'une table
+	 * @param entity Element à supprimer
+	 */
+	public void delete(E entity);
+	/**
 	 * Récupération d'une table
 	 * @return
 	 */

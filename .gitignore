@@ -1,8 +1,10 @@
 #Fichiers CSV
 *.csv*
 #Fichiers non tracés
-front/src/lib/*.*
+front/src/lib/**
 front/src/css/bootstrap.min.css
+front/src/css/bootstrap-dialog.min.css
+front/src/css/fullcalendar.min.css
 back/restapi/.*
 back/restapi/target
 local

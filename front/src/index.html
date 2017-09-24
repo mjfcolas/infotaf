@@ -6,10 +6,17 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/style-table.css">
   <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/bootstrap-dialog.min.css">
+  <link rel='stylesheet' href='css/fullcalendar.min.css' />
   <script src="lib/jquery-3.2.1.min.js"></script>
   <script src="lib/bootstrap.min.js"></script>
   <script src="lib/notify.min.js"></script>
+  <script src="lib/bootstrap-dialog.min.js"></script>
+  <script src="lib/vue.js"></script>
   <script src="lib/w3.js"></script>
+  <script src="lib/moment.min.js"></script>
+  <script src="lib/fullcalendar/fullcalendar.min.js"></script>
+  <script src="lib/lodash.js"></script>
   <script src="properties.js"></script>
   <script src="messages.js"></script>
   <script src="utils.js"></script>
@@ -21,6 +28,7 @@
   <script src="displayNews.js"></script>
   <script src="account.js"></script>
   <script src="administration.js"></script>
+  <script src="calendar.js"></script>
   <script src="index.js"></script>
 </head>
 <body>
@@ -28,7 +36,6 @@
   <!-- Popins-->
   <div w3-include-html="loginModal.html"></div>
   <div w3-include-html="accountModal.html"></div>
-  <div w3-include-html="createNews.html"></div>
   <div w3-include-html="administrationModal.html"></div>
 
   <div class="container">
@@ -96,7 +103,7 @@
           <div class="row">
             <div id="info-pg-tabs-content-consos" class="info-pg-tabs-content">
               <div class="col-md-8" id="table-manips">
-                <table class="table-fill">
+                <table class="custom-table-style">
                   <thead>
                     <tr>
                       <th>Nom</th><th>Quantité</th><th>Prix</th><th>Sous total</th>
@@ -107,7 +114,7 @@
                 </table>
               </div>
               <div class="col-md-4" id="table-cotizs">
-                <table class="table-fill">
+                <table class="custom-table-style">
                   <thead>
                     <tr>
                       <th>Nom</th><th>Prix</th><th>Payée</th>
@@ -161,18 +168,72 @@
           </div>
         </div>
       </div>
-      <div class="col-md-4">
-        <fieldset>
-          <legend>Informations</legend>
-          <div id="admin-news" class="ROLE_ADM">
-            <button type="button" id="new-news-button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#create-news-modal">Nouveau billet</button>
+      <div id="newsCompoment">
+        <!-- Popin création de news -->
+        <div id="create-news-modal" class="modal fade" role="dialog">
+          <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Ecrire un billet</h4>
+              </div>
+              <div class="modal-body">
+                <div class="container-fluid">
+                  <form id="news-form">
+                    <div class="row">
+                      <div class="col-md-2">
+                        <label for="news-form-title-label">Titre</label>
+                      </div>
+                      <div class="col-md-10">
+                        <input type="text" v-model="formNews.title" id="news-form-title-input"/>
+                      </div>
+                    </div>
+                    <div class="row row-form">
+                      <div class="col-md-2">
+                        <label for="news-form-content-label">Contenu</label>
+                      </div>
+                      <div class="col-md-10">
+                        <textarea id="news-form-content-textarea" class="big-textarea" v-model="formNews.content" maxlength="2000"></textarea>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" v-on:click="createNews" class="btn btn-default" id="create-news-button">Sauvegarder</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
+              </div>
+            </div>
+
           </div>
-          <div id="news">
+        </div>
+        <!-- Panneau news -->
+        <div class="col-md-4">
+          <fieldset>
+            <legend>Informations</legend>
+            <div id="admin-news" class="ROLE_ADM">
+              <button type="button" id="new-news-button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#create-news-modal">Nouveau billet</button>
+            </div>
+            <div v-for="curNews in orderedNews">
+              <h3>
+                {{curNews.title}} {{curNews.date | date('dd/MM/yyyy')}}
+                <button v-on:click="askDeleteNews(curNews.id)" :data-news-id="curNews.id" type="button" class="ROLE_ADM close delete-news" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </h3>
+              <p>{{curNews.content}}</p>
+            </div>
+            <div id="news">
+            </div>
+          </fieldset>
           </div>
-        </fieldset>
         </div>
       </div>
     </div>
   </div>
 </body>
 </html>
+
+<script src="commons/customFilters.js"></script>
+<script src="components/news/newsComponent.js"></script>

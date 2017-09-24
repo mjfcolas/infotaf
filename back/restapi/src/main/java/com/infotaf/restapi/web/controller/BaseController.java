@@ -28,6 +28,7 @@ import com.infotaf.restapi.service.NewsService;
 import com.infotaf.restapi.service.ParamService;
 import com.infotaf.restapi.service.PgService;
 import com.infotaf.restapi.web.viewModel.Infos;
+import com.infotaf.restapi.web.viewModel.NewsView;
 import com.infotaf.restapi.web.viewModel.PgBase;
 import com.infotaf.restapi.web.viewModel.PgComplete;
 
@@ -122,8 +123,11 @@ public class BaseController {
 		try{
 			CheckUserAuthorize.checkUser(principal, RoleEnum.ADM);
 			
-			newsService.saveNews(news);
+			int id = newsService.saveNews(news);
+			news.setId(id);
+			NewsView returnNews = new NewsView(news);
 			
+			result.setObject(returnNews);
 			result.setSuccess(true);
 			result.setMessage(AppConfig.messages.getProperty("notif.success"));
 		}catch(UnauthorizedUserException e){
@@ -135,6 +139,35 @@ public class BaseController {
 			result.setMessage(AppConfig.messages.getProperty("notif.exception.unknownError"));
 		}
 		
+		return result;
+	}
+	
+	/**
+	 * Création d'une news
+	 * @param principal utilisateur connecté
+	 * @param news news pasée
+	 * @return Résultat de l'action
+	 */
+	@RequestMapping("auth/deleteNews")
+	public BusinessStatus DeleteNews(JwtAuthenticationToken principal, int newsId){
+		logger.debug("IN - {0}", newsId);
+		BusinessStatus result = new BusinessStatus();
+
+		try{
+			CheckUserAuthorize.checkUser(principal, RoleEnum.ADM);
+			newsService.deleteNews(newsId);
+			
+			result.setSuccess(true);
+			result.setMessage(AppConfig.messages.getProperty("notif.success"));			
+		}catch(UnauthorizedUserException e){
+			result.setSuccess(false);
+			result.setMessage(AppConfig.messages.getProperty("notif.exception.unauthorizedUser"));
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			result.setSuccess(false);
+			result.setMessage(AppConfig.messages.getProperty("notif.exception.unknownError"));
+		}
 		return result;
 	}
 	

@@ -27,9 +27,18 @@ public class NewsService implements INewsService{
 	}
     
     @Transactional(readOnly = false)
-    public void saveNews(News news){
+    public int saveNews(News news){
     	logger.debug("IN");
     	news.setDate(new Date());
     	newsDao.save(news);
+    	return news.getId();
+	}
+    
+    @Transactional(readOnly = false)
+    public void deleteNews(int newsId){
+    	logger.debug("IN");
+    	News news = new News();
+    	news.setId(newsId);
+    	newsDao.delete(news);
 	}
 }

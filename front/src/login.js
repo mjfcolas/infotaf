@@ -212,3 +212,12 @@ Login.prototype.manageDomElements = function(){
     }
   }
 }
+Login.prototype.toggleDomElement = function(jElement){
+  for(var i = 0; i < this.availableRoles.length; i++){
+    if(this.roles.indexOf(this.availableRoles[i]) === -1){
+      jElement.removeClass("granted");
+    }else{
+      jElement.addClass("granted");
+    }
+  }
+}

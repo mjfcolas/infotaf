@@ -45,6 +45,10 @@ public abstract class GenericDao<E> implements IGenericDao<E>{
 			getSession().delete(entity);
 		}
 	}
+	
+	public void delete(E entity) {
+		getSession().delete(entity);
+	}
 
 	public List<E> findAll() {
 		return getSession().createCriteria(this.entityClass).list();
