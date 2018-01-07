@@ -20,6 +20,7 @@ public class PgComplete extends PgBase{
 	protected String workDetails;
 	protected BigDecimal totalTaf;
 	protected BigDecimal totalDu;
+	protected BigDecimal totalPaye;
 	
 	protected List<ManipBase> manips = new ArrayList<ManipBase>();
 	
@@ -124,6 +125,28 @@ public class PgComplete extends PgBase{
 						BigDecimal current = manip.getTotalPrice();
 						if(current != null){
 							result = result.add(current);
+						}
+					}
+				}
+			}
+		}
+		return result;
+	}
+	
+	/**
+	 * Calcul des apports d'argent du PG
+	 * @return
+	 */
+	public BigDecimal getTotalPaye(){
+		BigDecimal result = new BigDecimal(0);
+		
+		if(manips != null){
+			for (ManipBase manip : manips) {
+				if(manip != null){
+					if(manip.getType() == 3){//On ne prend en compte que les apports
+						BigDecimal current = manip.getTotalPrice();
+						if(current != null){
+							result = result.subtract(current);
 						}
 					}
 				}

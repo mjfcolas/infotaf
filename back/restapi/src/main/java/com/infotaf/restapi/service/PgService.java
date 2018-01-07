@@ -108,6 +108,38 @@ public class PgService implements IPgService{
 			return null;
 		}
 	}
+	
+	@Transactional(readOnly = true)
+	public List<PgComplete> getAllPgsWithManips(){
+		logger.debug("IN");
+		
+		//Récupération d'un Pg a partir de la clé unique fournie
+		List<Pg> pgList = pgDao.findAll();
+		List<PgComplete> result = new ArrayList<PgComplete>();
+		for (Pg pg : pgList) {
+			List<PgManip> manips = pgManipDao.getManipsForPg(pg.getId());
+			result.add(new PgComplete(pg, manips));
+		}
+		
+		return result;
+	}
+	
+	@Transactional(readOnly = true)
+	public Pg getPg(String pgId){
+		logger.debug("IN - pgId: {}", pgId);
+		//Formattage de la clé unique sur laquelle le filtre va être effectué à partir du paramètre pgId
+		Map<String, String> parsedPg;
+		try {
+			parsedPg = Utils.ParsePg(pgId);
+		} catch (PgFormatException e) {
+			return null;
+		}
+		
+		//Récupération d'un Pg a partir de la clé unique fournie
+		Pg pg = pgDao.getPg(parsedPg.get("nums"), parsedPg.get("tbk"), parsedPg.get("proms"));
+		return pg;
+	}
+	
 	@Transactional(readOnly = false)
 	public void savePg(Pg pg){
 		pgDao.save(pg);
@@ -141,6 +173,22 @@ public class PgService implements IPgService{
 	}
 	
 	@Transactional(readOnly = false)
+	public void updateAccount(Pg pg){
+		logger.debug("IN - nums: {}, tbk: {}, proms: {}", pg.getNums(), pg.getTbk() , pg.getProms());
+		
+		Pg pgDb = pgDao.getPg(pg.getNums(), pg.getTbk(), pg.getProms());
+		if(pgDb != null){
+			pgDb.setMail(pg.getMail());
+			if(pg.getPassword() != null && !"".equals(pg.getPassword().trim()) ){
+				BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+				String encodedPassword = encoder.encode(pg.getPassword());
+				pgDb.setPassword(encodedPassword);
+			}
+			pgDao.update(pgDb);
+		}
+	}
+	
+	@Transactional(readOnly = false)
 	public PgBase addRoleToPg(String pg, RoleEnum role) throws BusinessException, PgFormatException{
 		logger.debug("IN - pg: {}", pg, role.name());
 		
@@ -167,18 +215,5 @@ public class PgService implements IPgService{
 		
 		return new PgBase(pgDb);
 
-	}
-	
-	@Transactional(readOnly = false)
-	public void updatePassword(Pg pg){
-		logger.debug("IN - nums: {}, tbk: {}, proms: {}", pg.getNums(), pg.getTbk() , pg.getProms());
-		
-		Pg pgDb = pgDao.getPg(pg.getNums(), pg.getTbk(), pg.getProms());
-		if(pgDb != null){
-			BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-			String encodedPassword = encoder.encode(pg.getPassword());
-			pgDb.setPassword(encodedPassword);
-			pgDao.update(pgDb);
-		}
 	}
 }

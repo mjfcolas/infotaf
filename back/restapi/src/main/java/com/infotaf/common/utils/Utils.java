@@ -3,7 +3,10 @@ package com.infotaf.common.utils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -15,6 +18,7 @@ import javax.mail.Message;
 import javax.mail.Multipart;
 import javax.mail.Part;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,13 +40,17 @@ public class Utils{
 	 * @param srcFile Fichier à renommer
 	 * @throws IOException
 	 */
-	public static void RenameFile(File srcFile) throws IOException{
+	public static void RenameFile(File srcFile, boolean isError) throws IOException{
 		logger.debug("IN - srcName: {}", srcFile.getName());
 		String oldName = srcFile.getName();
         String dateFormat = (String) AppConfig.prop.get("infotaf.dateformat");
         String currentDate = new SimpleDateFormat(dateFormat).format(new Date());
         String path = srcFile.getPath().substring(0,srcFile.getPath().lastIndexOf(File.separator));
         String newName = path+File.separator+oldName+"."+currentDate;
+        if(isError){
+        	String errorSuffix = (String) AppConfig.prop.get("infotaf.errorsuffix");
+        	newName += errorSuffix;
+        }
         logger.debug("newName: {}", newName);
         File tgtFile = new File(newName);
         Files.move(srcFile.toPath(), tgtFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -156,4 +164,28 @@ public class Utils{
 	    }
 	    return result;
 	}
+	/**
+	 * Stocker un fichier complet dans un String
+	 * @param path Chemin du fichier à lire
+	 * @param encoding Charset à utiliser
+	 * @return String contenant tout le fichier
+	 * @throws IOException
+	 */
+	public static String readFile(File file, String encoding) 
+			  throws IOException 
+	{
+	  byte[] encoded = Files.readAllBytes(file.toPath());
+	  return new String(encoded, encoding);
+	}
+	
+	public static String readInputStream(InputStream inputStream, String encoding) 
+			  throws IOException 
+	{
+		StringWriter writer = new StringWriter();
+		IOUtils.copy(inputStream, writer, encoding);
+		String result = writer.toString();
+		return result;
+	}
+	
+	
 }

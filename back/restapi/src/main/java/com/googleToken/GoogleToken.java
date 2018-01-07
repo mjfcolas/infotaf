@@ -14,7 +14,9 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.infotaf.common.exceptions.BusinessException;
 import com.infotaf.filewatcher.FileWatcher;
+import com.infotaf.restapi.config.AppConfig;
 
 /**
  * Classe pour mettre à jour le token d'accès à l'API google
@@ -39,7 +41,16 @@ public class GoogleToken{
 		this.setRefreshToken(refreshToken);
 	}
 	
-	public String getAccessToken() throws Exception {
+	public GoogleToken(){
+		String oauthClientId = AppConfig.mailProp.getProperty("mail.oautch.clientid");
+		String oauthSecret = AppConfig.mailProp.getProperty("mail.oauth.secret");
+		String refreshToken = AppConfig.mailProp.getProperty("mail.oauth.refreshtoken");
+		this.setOauthClientId(oauthClientId);
+		this.setOauthSecret(oauthSecret);
+		this.setRefreshToken(refreshToken);
+	}
+	
+	public String getAccessToken() throws BusinessException {
 	    if(System.currentTimeMillis() > tokenExpires) {
 	    	//Réinitialisation du token
 	    	accessToken = null;
@@ -75,7 +86,7 @@ public class GoogleToken{
 	        }
 	    }
 	    if(accessToken == null || accessToken.equals("")){
-	    	throw new Exception("Impossible de déterminer le token");
+	    	throw new BusinessException("Impossible de déterminer le token");
 	    }
 	    return accessToken;
 	}

@@ -27,7 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
-import com.googleToken.GoogleToken;
+import com.infotaf.common.exceptions.BusinessException;
 import com.infotaf.common.utils.Utils;
 import com.infotaf.restapi.config.AppConfig;
 import com.infotaf.restapi.model.Manip;
@@ -67,9 +67,7 @@ public class FileWatcher {
 	
 	protected File folder = null;
 	private int sleepTime = Integer.parseInt((String) AppConfig.prop.get("filewatcher.period"));
-	private RawTafFile rawTafFile;
-	private GoogleToken googleToken;
-	
+	private RawTafFile rawTafFile;	
 	
 	/**
 	 * Boucle infinie (sauf si runFileWatcher passe à false) surveillant un dossier et une boite mail
@@ -78,12 +76,6 @@ public class FileWatcher {
 	 */
 	public void checkFiles() throws InterruptedException{
 		logger.debug("IN");
-
-		//Initialisation de la classe pour récupérer les tokens d'accès
-		String oauthClientId = AppConfig.mailProp.getProperty("mail.oautch.clientid");
-		String oauthSecret = AppConfig.mailProp.getProperty("mail.oauth.secret");
-		String refreshToken = AppConfig.mailProp.getProperty("mail.oauth.refreshtoken");
-		googleToken = new GoogleToken(oauthClientId, oauthSecret, refreshToken);
 		
 		while(runFileWatcher){
 			checkFilesInMails();
@@ -99,17 +91,27 @@ public class FileWatcher {
 		{
 			Properties props = new Properties();
 	
-			props.put("mail.imap.ssl.enable", "true"); // required for Gmail
-			props.put("mail.imap.auth.mechanisms", "XOAUTH2");
+			String authMecanism = AppConfig.mailProp.getProperty("mail.server.authmechanism");
+			
+			props.put("mail.imap.ssl.enable", AppConfig.mailProp.getProperty("mail.server.enablessl"));
+			props.put("mail.imap.starttls.enable", AppConfig.mailProp.getProperty("mail.server.enablestarttls"));
+			props.put("mail.imap.auth.mechanisms", authMecanism);
 			
 			Session session = Session.getInstance(props);
 			Store store = session.getStore("imap");
 					  		    
 			//Paramètres pour connection avec actualisation du token d'accès si necessaire
 			String server = AppConfig.mailProp.getProperty("mail.server.imap");
-			String user = AppConfig.mailProp.getProperty("mail.server.user");
-			String accessToken = googleToken.getAccessToken();
-		    store.connect(server, user, accessToken);
+			String user = AppConfig.mailProp.getProperty("mail.server.imap.user");
+			
+			String passwordOrToken = "";
+			if(authMecanism.equals("XOAUTH2")){
+				passwordOrToken = AppConfig.googleToken.getAccessToken();
+			    
+			}else{
+				passwordOrToken = AppConfig.mailProp.getProperty("mail.credentials.imap.password");
+			}
+			store.connect(server, user, passwordOrToken);
 
 		    //create the folder object and open it
 		    Folder emailFolder = store.getFolder("INBOX");
@@ -147,6 +149,10 @@ public class FileWatcher {
 				    		if(goodMailFound){
 				    			break;
 				    		}
+			    		}
+			    		//Dans le cas ou les mails commencent à avoir des dates inférieures à la date de mise à jour, on arrète de chercher
+			    		if(updateDate != null && mailDate != null && mailDate.compareTo(updateDate) < 0){
+			    			break;
 			    		}
 			    	}
 		    	}
@@ -222,7 +228,14 @@ public class FileWatcher {
 		if(listOfFiles != null){
 		    for (int i = 0; i < listOfFiles.length; i++) {
 		    	if(isFileCorrect(listOfFiles[i])){
-		    		processFile(listOfFiles[i]);
+		    		int result = processFile(listOfFiles[i]);
+		    		if(result != 0){
+		    			try{
+		    				Utils.RenameFile(listOfFiles[i], true);
+		    			}catch(IOException e){
+		    				e.printStackTrace();
+		    			}
+		    		}
 		    	}
 		    }
 		}
@@ -251,6 +264,7 @@ public class FileWatcher {
 	 * Parse et enregistrement en base d'un fichier
 	 * @param fileToProcess
 	 * @return
+	 * @throws IOException 
 	 */
 	private int processFile(File fileToProcess){
 		
@@ -263,7 +277,7 @@ public class FileWatcher {
 			pgManipService.deletePgManips();
 			manipService.deleteManips();
 			//Parse du fichier
-            reader = new CSVReader(new FileReader(fileToProcess));
+            reader = new CSVReader(new FileReader(fileToProcess), ';');
             rawTafFile = appContext.getBean(RawTafFile.class, reader);
             //Enregistrement du fichier en base
             logger.info("Enregistrement du fichier");
@@ -276,18 +290,23 @@ public class FileWatcher {
             pgManipService.savePgManips(pgManips);
             //Renommage du fichier
             logger.info("Renommage du fichier");
-            Utils.RenameFile(fileToProcess);
+            Utils.RenameFile(fileToProcess, false);
             //Enregistrement du paramètre
             String dateFormat = (String) AppConfig.prop.get("infotaf.dateformat");
             String keyParam = (String) AppConfig.configConstants.get("param.key.updatedate");
             String currentDate = new SimpleDateFormat(dateFormat).format(new Date());
             logger.info("Date de mise à jour : {}",  currentDate);
             paramService.saveParam(keyParam, currentDate);
+		} catch(BusinessException e){
+			e.printStackTrace();
+			logger.error("Erreur d'enregistrement du fichier" + e.getMessage());
+			return -1;
         } catch(IOException e){
         	e.printStackTrace();
         	return -1;
         } catch (Exception e) {
             e.printStackTrace();
+            logger.error("Erreur d'enregistrement du fichier");
             return -1;
         }
 		return 0;

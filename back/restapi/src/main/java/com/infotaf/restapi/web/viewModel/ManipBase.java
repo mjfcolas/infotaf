@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import com.infotaf.restapi.model.Manip;
 import com.infotaf.restapi.model.PgManip;
+import com.infotaf.restapi.model.Serializable;
 
 /**
  * Informations représentait la participation d'un pg à la manip, sans les liens avec le Pg en question

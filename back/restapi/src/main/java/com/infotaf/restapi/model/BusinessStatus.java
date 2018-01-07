@@ -1,6 +1,6 @@
 package com.infotaf.restapi.model;
 
-import com.infotaf.restapi.web.viewModel.Serializable;
+import java.util.List;
 
 /**
  * Représente le résultat d'une opération sur le serveur
@@ -31,6 +31,9 @@ public class BusinessStatus {
 	}
 	public void setMessage(String message) {
 		this.message = message;
+	}
+	public void concatMessage(String message){
+		this.message += message;
 	}
 	public String getValue() {
 		return value;

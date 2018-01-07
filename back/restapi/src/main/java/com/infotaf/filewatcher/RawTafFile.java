@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import com.infotaf.common.exceptions.BusinessException;
 import com.infotaf.restapi.model.Manip;
 import com.infotaf.restapi.model.Pg;
 import com.infotaf.restapi.model.PgManip;
@@ -200,7 +201,7 @@ public class RawTafFile {
 	 * Récupère les manips/cotizs/apports présentes dans le fichier de taf
 	 * @return Liste des manips prète à être enregistrée en base
 	 */
-	public List<Manip> getManips(){
+	public List<Manip> getManips() throws BusinessException{
 		logger.debug("IN");
 		List<Manip> manips = new ArrayList<Manip>();
 		List<String> keysForPgManips = new ArrayList<String>();
@@ -212,22 +213,28 @@ public class RawTafFile {
 		Integer priceRowId = getRidForKey(priceKey);
 		
 		for (Integer currentColid : manipColIds) {
-			Manip currentManip = new Manip();
-			currentManip.setNom(content.get(nameRowId).get(currentColid));
-			String rawPrice = content.get(priceRowId).get(currentColid);
-			rawPrice = rawPrice.replace(',', '.');
-			BigDecimal price = new BigDecimal(rawPrice);
-			currentManip.setPrix(price);
-			if(columnsMap.get(currentColid).equals(manipKey)){
-				currentManip.setType(1);
-			}else if(columnsMap.get(currentColid).equals(cotizKey)){
-				currentManip.setType(2);
-			}else if(columnsMap.get(currentColid).equals(apportKey)){
-				currentManip.setType(3);
+			try{
+				Manip currentManip = new Manip();
+				currentManip.setNom(content.get(nameRowId).get(currentColid));
+				String rawPrice = content.get(priceRowId).get(currentColid);
+				rawPrice = rawPrice.replace(',', '.');
+				if(rawPrice == null || rawPrice.isEmpty()){//Valeur par défaut à 1€ pour faire coincider la quantité par PG quand elle correspond au prix
+					rawPrice = "1";
+				}
+				BigDecimal price = new BigDecimal(rawPrice);
+				currentManip.setPrix(price);
+				if(columnsMap.get(currentColid).equals(manipKey)){
+					currentManip.setType(1);
+				}else if(columnsMap.get(currentColid).equals(cotizKey)){
+					currentManip.setType(2);
+				}else if(columnsMap.get(currentColid).equals(apportKey)){
+					currentManip.setType(3);
+				}
+				manips.add(currentManip);
+			}catch(NumberFormatException e){
+				throw new BusinessException("Récupération des manips: Impossible de parser la valeur à la colonne " + currentColid.toString());
 			}
-			manips.add(currentManip);
 		}
-		
 		return manips;
 	}
 	
@@ -235,7 +242,7 @@ public class RawTafFile {
 	 * Récupération des participations des Pgs aux manips
 	 * @return Liste de PgManip prète à être enregistrée en base
 	 */
-	public List<PgManip> getPgManips(){
+	public List<PgManip> getPgManips() throws BusinessException{
 		logger.debug("IN");
 		List<PgManip> pgManips = new ArrayList<PgManip>();
 		List<String> keysForPgManips = new ArrayList<String>();
@@ -274,7 +281,7 @@ public class RawTafFile {
 						}
 					}
 				}catch(Exception e){
-					System.out.println("Erreur pour la case " + pgRowId.toString() + " " + manipColId.toString());
+					throw new BusinessException("Erreur pour la case " + pgRowId.toString() + " " + manipColId.toString());
 				}
 			}
 		}

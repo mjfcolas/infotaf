@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.infotaf.restapi.model.News;
+import com.infotaf.restapi.model.Serializable;
 
 /**
  * Objet représentant une news

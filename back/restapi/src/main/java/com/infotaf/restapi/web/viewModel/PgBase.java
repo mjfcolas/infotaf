@@ -1,9 +1,10 @@
 package com.infotaf.restapi.web.viewModel;
 
 import com.infotaf.restapi.model.Pg;
+import com.infotaf.restapi.model.Serializable;
 
 /**
- * Représénte un Pg avec la liste de toutes les manips auxquelles il a participé
+ * Représénte un Pg sans les manips auxquelles il a participé
  * @author emmanuel
  *
  */
@@ -15,7 +16,7 @@ public class PgBase extends Serializable{
 	protected String proms;
 	protected String firstName;
 	protected String lastName;
-	
+	protected String mail;
 	
 	public PgBase(){
 		
@@ -28,6 +29,7 @@ public class PgBase extends Serializable{
 		this.proms = pg.getProms();
 		this.firstName = pg.getFirstName();
 		this.lastName = pg.getLastName();
+		this.mail = pg.getMail();
 	}
 
 	public int getId() {
@@ -76,5 +78,13 @@ public class PgBase extends Serializable{
 
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
+	}
+
+	public String getMail() {
+		return mail;
+	}
+
+	public void setMail(String mail) {
+		this.mail = mail;
 	}
 }

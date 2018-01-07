@@ -2,6 +2,8 @@ package com.infotaf.restapi.web.viewModel;
 
 import java.util.Date;
 
+import com.infotaf.restapi.model.Serializable;
+
 
 /**
  * Informations sur les données affichées (date...)

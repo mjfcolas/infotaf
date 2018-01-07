@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.Properties;
 import javax.sql.DataSource;
 import org.hibernate.SessionFactory;
@@ -19,6 +21,7 @@ import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
+import com.googleToken.GoogleToken;
 
 /**
  * Configuration de l'application
@@ -37,6 +40,10 @@ public class AppConfig{
 	public static Properties messages = new Properties();
 	
 	public static DataSource dataSource = null;
+	public static GoogleToken googleToken = null;
+	
+	public static DecimalFormat df = new DecimalFormat("#.00");
+	public static DecimalFormatSymbols dfs = df.getDecimalFormatSymbols();
 	
 	static{
 		try {
@@ -45,6 +52,9 @@ public class AppConfig{
 			configConstants.load(AppConfig.class.getClassLoader().getResourceAsStream("configConstants.properties"));
 			InputStream messageInput = AppConfig.class.getClassLoader().getResourceAsStream("message.properties");
 			messages.load(new InputStreamReader(messageInput, Charset.forName("UTF-8")));
+			googleToken = new GoogleToken();
+			dfs.setDecimalSeparator('.');
+		    df.setDecimalFormatSymbols(dfs);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

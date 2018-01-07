@@ -24,6 +24,17 @@ public interface IPgService{
 	 */
 	public PgComplete getPgWithManips(String pgId);
 	/**
+	 * Récupération de tous les PGs en base avec les manips auxquelles ils ont participés
+	 * @return tous les PGs en base
+	 */
+	public List<PgComplete> getAllPgsWithManips();
+	/**
+	 * Récupération d'un Pg à partir de son nums
+	 * @param pgId: NTP du Pg
+	 * @return
+	 */
+	public Pg getPg(String pgId);
+	/**
 	 * Sauvegarde sans update d'un Pg 
 	 * @param pg : l'objet Pg représentatif de la base à sauvegarder
 	 */
@@ -51,10 +62,10 @@ public interface IPgService{
 	 */
 	public void updateKifekoi(Pg pg);
 	/**
-	 * Modification du mot de passe d'un PG
-	 * @param pg le Pg avec le nouveau mot de passe non encodé
+	 * Mise à jour des informations relative au compte du PG
+	 * @param pg
 	 */
-	public void updatePassword(Pg pg);
+	public void updateAccount(Pg pg);
 	/**
 	 * Récupération de tous les PGs qui possèdent le rôle donné
 	 * @param role

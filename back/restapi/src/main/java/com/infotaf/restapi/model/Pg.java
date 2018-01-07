@@ -34,6 +34,7 @@ public class Pg{
 	protected String work;
 	protected String workDetails;
 	protected String password;
+	protected String mail;
 	
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "pg")
 	protected List<PgManip> pgManips;
@@ -118,6 +119,12 @@ public class Pg{
 	}
 	public void setPassword(String password) {
 		this.password = password;
+	}
+	public String getMail() {
+		return mail;
+	}
+	public void setMail(String mail) {
+		this.mail = mail;
 	}
 
 }

@@ -23,6 +23,7 @@ import com.infotaf.restapi.security.CheckUserAuthorize;
 import com.infotaf.restapi.security.auth.JwtAuthenticationToken;
 import com.infotaf.restapi.security.model.RoleEnum;
 import com.infotaf.restapi.security.model.UserContext;
+import com.infotaf.restapi.service.AdministrationService;
 import com.infotaf.restapi.service.ManipService;
 import com.infotaf.restapi.service.NewsService;
 import com.infotaf.restapi.service.ParamService;
@@ -31,6 +32,7 @@ import com.infotaf.restapi.web.viewModel.Infos;
 import com.infotaf.restapi.web.viewModel.NewsView;
 import com.infotaf.restapi.web.viewModel.PgBase;
 import com.infotaf.restapi.web.viewModel.PgComplete;
+import com.infotaf.restapi.web.viewModel.forms.RelaunchForm;
 
 @RestController
 @CrossOrigin
@@ -46,6 +48,8 @@ public class BaseController {
 	protected ParamService paramService;
 	@Autowired
 	protected NewsService newsService;
+	@Autowired
+	protected AdministrationService administrationService;
 	
 	/**
 	 * Retourne le timestamp du serveur
@@ -81,6 +85,28 @@ public class BaseController {
 	}
 	
 	/**
+	 * Récupération d'un pg sans manips
+	 * @param pg
+	 * @return
+	 */
+	@RequestMapping("auth/SimplePg")
+	public PgBase GetSimplePg(String pg){
+		logger.debug("IN - pg: {}", pg);
+
+		PgBase toReturn = null;
+		
+		Pg pgBase = pgService.getPg(pg);
+		
+		if(pgBase == null){
+			toReturn = new PgBase();
+		}else{
+			toReturn = new PgBase(pgBase);
+		}
+		
+		return toReturn;
+	}
+	
+	/**
 	 * Récupération des informations générales
 	 * @return
 	 */
@@ -93,6 +119,7 @@ public class BaseController {
 			toReturn.setDate(updateDate);
 		} catch (ParseException e) {
 			e.printStackTrace();
+			logger.error("Exception is: ", e);
 			toReturn = new Infos();
 		}
 		return toReturn;
@@ -133,9 +160,9 @@ public class BaseController {
 		}catch(UnauthorizedUserException e){
 			result.setSuccess(false);
 			result.setMessage(AppConfig.messages.getProperty("notif.exception.unauthorizedUser"));
-			
 		}catch(Exception e){
-			result.setSuccess(false);
+			e.printStackTrace();
+			logger.error("Exception is: ", e);
 			result.setMessage(AppConfig.messages.getProperty("notif.exception.unknownError"));
 		}
 		
@@ -165,6 +192,7 @@ public class BaseController {
 			
 		}catch(Exception e){
 			e.printStackTrace();
+			logger.error("Exception is: ", e);
 			result.setSuccess(false);
 			result.setMessage(AppConfig.messages.getProperty("notif.exception.unknownError"));
 		}
@@ -188,6 +216,7 @@ public class BaseController {
 			
 		}catch(Exception e){
 			e.printStackTrace();
+			logger.error("Exception is: ", e);
 			return new ArrayList<PgBase>();
 		}
 	}
@@ -221,6 +250,7 @@ public class BaseController {
 			result.setMessage(e.getMessage());
 		}catch(Exception e){
 			e.printStackTrace();
+			logger.error("Exception is: ", e);
 			result.setSuccess(false);
 			result.setMessage(AppConfig.messages.getProperty("notif.exception.unknownError"));
 		}
@@ -254,6 +284,7 @@ public class BaseController {
 			result.setMessage(e.getMessage());
 		}catch(Exception e){
 			e.printStackTrace();
+			logger.error("Exception is: ", e);
 			result.setSuccess(false);
 			result.setMessage(AppConfig.messages.getProperty("notif.exception.unknownError"));
 		}
@@ -277,9 +308,10 @@ public class BaseController {
 		}catch(UnauthorizedUserException e){
 			result.setSuccess(false);
 			result.setMessage(AppConfig.messages.getProperty("notif.exception.unauthorizedUser"));
-			
 		}
 		catch(Exception e){
+			e.printStackTrace();
+			logger.error("Exception is: ", e);
 			result.setSuccess(false);
 			result.setMessage(AppConfig.messages.getProperty("notif.exception.unknownError"));
 		}
@@ -288,29 +320,54 @@ public class BaseController {
 	}
 	
 	/**
-	 * Changement de mot de passe
+	 * Sauvegarde des infos du kifekoi
 	 * @return
 	 */
-	@RequestMapping("auth/ChangePassword")
-	public BusinessStatus ChangePassword(JwtAuthenticationToken principal, Pg pg){
+	@RequestMapping("auth/savePgAccount")
+	public BusinessStatus SavePgAccount(JwtAuthenticationToken principal, Pg pg){
 		BusinessStatus result = new BusinessStatus();
 		try{
 			CheckUserAuthorize.checkUser(principal, pg);
 			
-			pgService.updatePassword(pg);
+			pgService.updateAccount(pg);
 			
 			result.setSuccess(true);
 			result.setMessage(AppConfig.messages.getProperty("notif.success"));
 		}catch(UnauthorizedUserException e){
 			result.setSuccess(false);
 			result.setMessage(AppConfig.messages.getProperty("notif.exception.unauthorizedUser"));
-			
-		}catch(Exception e){
+		}
+		catch(Exception e){
+			e.printStackTrace();
+			logger.error("Exception is: ", e);
 			result.setSuccess(false);
 			result.setMessage(AppConfig.messages.getProperty("notif.exception.unknownError"));
 		}
 		
 		return result;
 	}
+	
+	/**
+	 * Sauvegarde des infos du kifekoi
+	 * @return
+	 */
+	@RequestMapping("auth/relaunchPg")
+	public BusinessStatus RelaunchPg(JwtAuthenticationToken principal, RelaunchForm form){
+		logger.debug("IN");
+		BusinessStatus result = new BusinessStatus();
 
+		try{
+			CheckUserAuthorize.checkUser(principal, RoleEnum.ADM);
+			result = administrationService.relaunchPg(form);
+		}catch(UnauthorizedUserException e){
+			result.setSuccess(false);
+			result.setMessage(AppConfig.messages.getProperty("notif.exception.unauthorizedUser"));
+		}catch(Exception e){
+			e.printStackTrace();
+			logger.error("Exception is: ", e);
+			result.setSuccess(false);
+			result.setMessage(AppConfig.messages.getProperty("notif.exception.unknownError"));
+		}
+		return result;
+	}
 }
