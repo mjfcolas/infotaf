@@ -14,7 +14,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name="param")
-public class Param{
+public class Param extends Serializable{
 	
 	@Id
 	@SequenceGenerator(name="param_seq",sequenceName="param_seq", initialValue = 1, allocationSize = 1)

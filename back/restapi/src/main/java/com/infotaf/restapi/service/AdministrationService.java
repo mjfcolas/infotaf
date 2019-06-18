@@ -1,6 +1,5 @@
 package com.infotaf.restapi.service;
 
-import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -10,24 +9,35 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import com.infotaf.common.utils.Utils;
 import com.infotaf.emailSender.EmailSender;
 import com.infotaf.restapi.config.AppConfig;
 import com.infotaf.restapi.model.BusinessStatus;
 import com.infotaf.restapi.model.Mail;
 import com.infotaf.restapi.model.MailSenderResult;
+import com.infotaf.restapi.model.Param;
 import com.infotaf.restapi.web.viewModel.PgBase;
 import com.infotaf.restapi.web.viewModel.PgComplete;
 import com.infotaf.restapi.web.viewModel.forms.RelaunchForm;
+import com.infotaf.taffilemanager.TafFileManager;
 
 @Service
-public class AdministrationService {
+public class AdministrationService implements IAdministrationService{
 	
 	private static final Logger logger = LoggerFactory.getLogger(AdministrationService.class);
 	
 	@Autowired
 	protected PgService pgService;
+	@Autowired
+	protected ParamService paramService;
+	@Autowired
+	protected TafFileManager tafFileManager;
+	
+	public BusinessStatus processTafFile(MultipartFile file){
+		
+		return tafFileManager.saveFile(file);
+	}
 	
 	public BusinessStatus relaunchPg(RelaunchForm form) throws IOException{
 		logger.debug("IN");
@@ -37,7 +47,7 @@ public class AdministrationService {
 		List<PgBase> pgToTreat = new ArrayList<PgBase>();
 		
 		String message = "";
-		if(form.isSimulation()){
+		if(form.getIsSimulation()){
 			message = AppConfig.messages.getProperty("message.relaunchMessageSimulation");
 		}else{
 			message = AppConfig.messages.getProperty("message.relaunchMessage");
@@ -47,8 +57,8 @@ public class AdministrationService {
 		
 		List<Mail> mails = new ArrayList<Mail>();
 		
-		ClassLoader classLoader = AdministrationService.class.getClassLoader();
-		String rawBody = Utils.readInputStream(classLoader.getResourceAsStream("tafMailBody.html"), "UTF-8");
+		Param param = paramService.getParam("mailtemplate");
+		String rawBody = param == null ? "" : param.getValue();
 		
 		for (PgComplete pg : pgList) {
 			//Sélection des PGs dont le montant du est supérieur au seuil fourni
@@ -78,7 +88,7 @@ public class AdministrationService {
 			}
 		}
 		result.setMessage(message);
-		if(!form.isSimulation()){
+		if(!form.getIsSimulation()){
 			MailSenderResult mailSenderResult = EmailSender.sendMail(mails);
 			result.setObject(mailSenderResult);
 		}

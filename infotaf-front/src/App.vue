@@ -59,7 +59,15 @@ export default {
   .small-input{
     width:75px;
   }
-
+  .text-color-red{
+    color: red;
+  }
+  .text-color-black{
+    color: black;
+  }
+  .text-color-green{
+    color: green;
+  }
   <!--Style des tables-->
   .custom-table-style{
     background: white;
@@ -139,7 +147,7 @@ export default {
     padding:2px;
     text-align:left;
     vertical-align:middle;
-    font-weight:100;
+    font-weight:bold;;
     font-size:13px;
     text-shadow: -1px -1px 1px rgba(0, 0, 0, 0.1);
     border-right: 1px solid #C1C3D1;

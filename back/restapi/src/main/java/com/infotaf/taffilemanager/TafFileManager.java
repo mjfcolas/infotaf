@@ -1,10 +1,12 @@
-package com.infotaf.filewatcher;
+package com.infotaf.taffilemanager;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
@@ -26,10 +28,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.infotaf.common.exceptions.BusinessException;
 import com.infotaf.common.utils.Utils;
 import com.infotaf.restapi.config.AppConfig;
+import com.infotaf.restapi.model.BusinessStatus;
 import com.infotaf.restapi.model.Manip;
 import com.infotaf.restapi.model.Pg;
 import com.infotaf.restapi.model.PgManip;
@@ -46,10 +50,11 @@ import com.opencsv.CSVReader;
  *
  */
 @Component
-public class FileWatcher {
+public class TafFileManager {
 	
-	private static final Logger logger = LoggerFactory.getLogger(FileWatcher.class);
+	private static final Logger logger = LoggerFactory.getLogger(TafFileManager.class);
 	private static boolean runFileWatcher = true;
+	private static boolean lock = false;
 	
 
 	@Autowired
@@ -73,16 +78,28 @@ public class FileWatcher {
 	 * Boucle infinie (sauf si runFileWatcher passe à false) surveillant un dossier et une boite mail
 	 * Temps de pause défini dans le fichier de config
 	 * @throws InterruptedException
+	 * @throws FileNotFoundException 
 	 */
 	public void checkFiles() throws InterruptedException{
 		logger.debug("IN");
 		
 		while(runFileWatcher){
-			checkFilesInMails();
-			checkFilesInFolder();
+			try{
+				//Désactivé pour ne laisser que la fonction d'import
+				//checkFilesInMails();
+				if(!lock){
+					checkFilesInFolder();
+				}
+			}
+			catch(IOException e){
+				e.printStackTrace();
+				logger.error(e.toString());
+			}
 			Thread.sleep(sleepTime*1000);
 		}
 	}
+	
+	
 	/**
 	 * Lecture des mails pour chercher les pièces jointes qui peuvent être importées
 	 */
@@ -137,10 +154,8 @@ public class FileWatcher {
 			    		Date mailDate = message.getSentDate();
 			    		if(updateDate == null || (mailDate != null && mailDate.compareTo(updateDate) > 0)){
 				    		for(Map.Entry<String, InputStream> entry : attachments.entrySet()) {
-				    		    String attachmentName = entry.getKey();
-				    		    String extension = (String) AppConfig.prop.get("filewatcher.extension");
-				    		    if(attachmentName.endsWith(extension)){
-				    		    	logger.info("Found one correct attachment: {}", attachmentName);
+				    		    if(isInputStreamCorrect(entry.getValue(), entry.getKey())){
+				    		    	logger.info("Found one correct attachment: {}", entry.getKey());
 				    		    	saveAttachment(entry.getValue(), entry.getKey());
 				    		    	goodMailFound = true;
 				    		    	break;
@@ -218,8 +233,11 @@ public class FileWatcher {
 	}
 	/**
 	 * Lecture d'un dossier pour importer les fichiers qui peuvent l'être
+	 * @throws IOException 
+	 * @throws FileNotFoundException 
 	 */
-	private void checkFilesInFolder(){
+	private void checkFilesInFolder() throws FileNotFoundException, IOException{
+		lock = true;
 		String directory = (String) AppConfig.prop.get("filewatcher.directory");
 		logger.trace("Verification des fichiers : {}", directory);
 		folder = new File(directory);
@@ -228,36 +246,94 @@ public class FileWatcher {
 		if(listOfFiles != null){
 		    for (int i = 0; i < listOfFiles.length; i++) {
 		    	if(isFileCorrect(listOfFiles[i])){
-		    		int result = processFile(listOfFiles[i]);
-		    		if(result != 0){
-		    			try{
-		    				Utils.RenameFile(listOfFiles[i], true);
-		    			}catch(IOException e){
-		    				e.printStackTrace();
-		    			}
-		    		}
+		    		try{
+		    			BusinessStatus result = processFile(new FileInputStream(listOfFiles[i]));
+		    			Utils.RenameFile(listOfFiles[i], !result.isSuccess());
+	    			}catch(IOException e){
+	    				e.printStackTrace();
+	    			}
 		    	}
 		    }
 		}
+		lock = false;
+	}
+	
+	private boolean checkExtension(String name){
+		String extension = (String) AppConfig.prop.get("filewatcher.extension");
+		if(name != null && name.endsWith(extension)){
+			return true;
+		}
+		return false;
 	}
 	
 	/**
 	 * Vérification si le fichier trouvé dans le dossier est apte à être parsé
 	 * @param fileToCheck
 	 * @return
+	 * @throws IOException 
+	 * @throws FileNotFoundException 
 	 */
-	private boolean isFileCorrect(File fileToCheck){
+	private boolean isFileCorrect(File fileToCheck) throws FileNotFoundException, IOException{
 		logger.debug("IN - fichier:{}", fileToCheck.getName());
-		String extension = (String) AppConfig.prop.get("filewatcher.extension");
+		boolean ok = false;
 		if(fileToCheck != null && !fileToCheck.isDirectory()){
-			if(fileToCheck.getName() != null 
-					&& fileToCheck.getName().endsWith(extension)){
-				logger.debug("Fichier correct");
-				return true;
-			}
+			InputStream inputToCheck = new FileInputStream(fileToCheck);
+			ok = isInputStreamCorrect(inputToCheck, fileToCheck.getName());
+			inputToCheck.close();
 		}
-		logger.debug("Fichier non correct");
-		return false;
+		logger.debug(!ok ? "Fichier non correct" : "Fichier correct");
+		return ok;
+	}
+	
+	/**
+	 * Vérifie un inputStream associé à un nom
+	 * @param inputToCheck
+	 * @param name
+	 * @return
+	 * @throws IOException
+	 */
+	private boolean isInputStreamCorrect(InputStream inputToCheck, String name) throws IOException{
+		boolean error = true;
+		if(checkExtension(name) && isInputText(inputToCheck)){
+			error = false;
+		}
+		return !error;
+	}
+	/**
+	 * Vérifie si un fichier est un fichier texte
+	 * @param fileToCheck
+	 * @return
+	 * @throws IOException 
+	 */
+	private boolean isInputText(InputStream fileToCheck) throws IOException{
+		
+		boolean result = Utils.checkPlainText(fileToCheck);
+		
+		logger.debug(result ? "Fichier correct" : "Fichier non correct");
+		return result;
+	}
+	
+	
+	/**
+	 * Vérifie et sauvegarde un fichier de taf
+	 * @param file
+	 * @return
+	 */
+	public BusinessStatus saveFile(MultipartFile file){
+		BusinessStatus result = new BusinessStatus();
+		try{
+			if(!isInputStreamCorrect(file.getInputStream(), file.getName())){
+				result.setSuccess(false);
+				result.setMessage((String)AppConfig.messages.get("taffile.error"));
+			}
+			else{
+				logger.info("Traitement du fichier {}", file.getName());
+				result = processFile(file.getInputStream());
+			}
+		}catch(IOException e){
+			e.printStackTrace();
+		}
+		return result;
 	}
 	
 	/**
@@ -266,31 +342,29 @@ public class FileWatcher {
 	 * @return
 	 * @throws IOException 
 	 */
-	private int processFile(File fileToProcess){
+	private BusinessStatus processFile(InputStream fileToProcess){
 		
 		logger.debug("IN");
-		logger.info("Traitement du fichier {}", fileToProcess.getName());
+		BusinessStatus result = new BusinessStatus();
 		
 		CSVReader reader = null;
 		try {
+			//Parse du fichier
+            reader = new CSVReader(new InputStreamReader(fileToProcess), ';');
+            rawTafFile = appContext.getBean(RawTafFile.class, reader);
+            //Récupération des infos
+            List<Pg> pgs = rawTafFile.getPgs();
+            List<Manip> manips = rawTafFile.getManips();
 			//Purge de la base
 			pgManipService.deletePgManips();
 			manipService.deleteManips();
-			//Parse du fichier
-            reader = new CSVReader(new FileReader(fileToProcess), ';');
-            rawTafFile = appContext.getBean(RawTafFile.class, reader);
             //Enregistrement du fichier en base
             logger.info("Enregistrement du fichier");
-            List<Pg> pgs = rawTafFile.getPgs();
-            List<Manip> manips = rawTafFile.getManips();
             pgService.savePgs(pgs);
             manipService.saveManips(manips);
             List<PgManip> pgManips = rawTafFile.getPgManips();
             reader.close();
             pgManipService.savePgManips(pgManips);
-            //Renommage du fichier
-            logger.info("Renommage du fichier");
-            Utils.RenameFile(fileToProcess, false);
             //Enregistrement du paramètre
             String dateFormat = (String) AppConfig.prop.get("infotaf.dateformat");
             String keyParam = (String) AppConfig.configConstants.get("param.key.updatedate");
@@ -300,16 +374,22 @@ public class FileWatcher {
 		} catch(BusinessException e){
 			e.printStackTrace();
 			logger.error("Erreur d'enregistrement du fichier" + e.getMessage());
-			return -1;
+			result.setMessage(e.getMessage());
+			result.setSuccess(false);
         } catch(IOException e){
+        	result.setSuccess(false);
+        	result.setMessage(e.getMessage());
         	e.printStackTrace();
-        	return -1;
         } catch (Exception e) {
+        	result.setSuccess(false);
+        	result.setMessage(e.getMessage());
             e.printStackTrace();
             logger.error("Erreur d'enregistrement du fichier");
-            return -1;
         }
-		return 0;
+		if(result.isSuccess()){
+			result.setMessage((String) AppConfig.messages.get("taffile.success"));
+		}
+		return result;
 	}
 
 }

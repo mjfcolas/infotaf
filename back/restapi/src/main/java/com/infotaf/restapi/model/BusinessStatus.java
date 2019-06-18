@@ -1,6 +1,5 @@
 package com.infotaf.restapi.model;
 
-import java.util.List;
 
 /**
  * Représente le résultat d'une opération sur le serveur

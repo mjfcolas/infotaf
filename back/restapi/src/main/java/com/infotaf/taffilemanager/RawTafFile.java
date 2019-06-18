@@ -1,4 +1,4 @@
-package com.infotaf.filewatcher;
+package com.infotaf.taffilemanager;
 
 import java.io.IOException;
 import java.math.BigDecimal;

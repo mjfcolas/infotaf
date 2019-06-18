@@ -4,9 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -187,5 +185,39 @@ public class Utils{
 		return result;
 	}
 	
+	public static boolean checkPlainText(InputStream inputStream) {
+		 
+        boolean result = false;
+ 
+        try {
+ 
+            int c;
+            while ((c = inputStream.read()) != -1) {
+ 
+//                (10)Line feed  (11)Vertical tab (13)Carriage return (32)Space (126)tilde
+                if (c == 10 || c == 11 || c == 13 || (c >= 32 && c <= 126)) {
+                    result = true;
+                     
+//                       (153)Superscript two (160)ϊ  (255) No break space                     
+                } else if(c == 153 || c >= 160 && c <= 255){
+                     result = true;
+                             
+//                        (884)ʹ (885)͵ (890)ͺ (894); (900)' (974)ώ 
+                } else if (c == 884 || c == 885 || c == 890 || c == 894 || c >= 900 && c <= 974 ) {
+                    result = true;
+                     
+                } else {
+                    result=false;
+                    break;
+                }
+               
+                }
+        }catch(Exception e){
+        	logger.error(e.toString());
+        	e.printStackTrace();
+        	result = false;
+        }
+        return result;
+    }
 	
 }

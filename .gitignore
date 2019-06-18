@@ -8,3 +8,7 @@ local
 #configuration spécifique à chacun
 back/restapi/profiles
 infotaf-front/profiles
+infotaf-front/.scannerwork
+.scannerwork
+npm-debug.log
+sonar-project.properties

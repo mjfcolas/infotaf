@@ -272,13 +272,6 @@ export default {
 .pg-infos-legend{
   display:inline-block;
 }
-.text-color-red{
-  color: red;
-}
-
-.text-color-green{
-  color: green;
-}
 .number{
   text-align:right;
 }

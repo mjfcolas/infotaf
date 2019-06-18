@@ -3,6 +3,7 @@ package com.infotaf.restapi.web.controller;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -11,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.infotaf.common.exceptions.BusinessException;
 import com.infotaf.common.exceptions.PgFormatException;
@@ -172,7 +175,7 @@ public class BaseController {
 	/**
 	 * Création d'une news
 	 * @param principal utilisateur connecté
-	 * @param news news pasée
+	 * @param newsId news pasée
 	 * @return Résultat de l'action
 	 */
 	@RequestMapping("auth/deleteNews")
@@ -219,6 +222,56 @@ public class BaseController {
 			logger.error("Exception is: ", e);
 			return new ArrayList<PgBase>();
 		}
+	}
+	
+	/**
+	 * Récupération du template de mail
+	 * @param principal utilisateur connecté
+	 * @return Le template de mail
+	 */
+	@RequestMapping("auth/getMailTemplate")
+	public BusinessStatus GetMailTemplate(JwtAuthenticationToken principal){
+		logger.debug("IN");
+		BusinessStatus result = new BusinessStatus();
+		try{
+			CheckUserAuthorize.checkUser(principal, RoleEnum.ADM);
+			result.setObject(paramService.getParam("mailtemplate"));
+		}catch(UnauthorizedUserException e){
+			result.setSuccess(false);
+			result.setMessage(AppConfig.messages.getProperty("notif.exception.unauthorizedUser"));
+		}catch(Exception e){
+			e.printStackTrace();
+			logger.error("Exception is: ", e);
+			result.setSuccess(false);
+			result.setMessage(AppConfig.messages.getProperty("notif.exception.unknownError"));
+		}
+		return result;
+	}
+	
+	/**
+	 * Récupération du template de mail
+	 * @param principal utilisateur connecté
+	 * @return Le template de mail
+	 */
+	@RequestMapping("auth/saveMailTemplate")
+	public BusinessStatus SaveMailTemplate(JwtAuthenticationToken principal, String mail){
+		logger.debug("IN");
+		BusinessStatus result = new BusinessStatus();
+		try{
+			CheckUserAuthorize.checkUser(principal, RoleEnum.ADM);
+			paramService.saveParam("mailtemplate", mail);
+			result.setSuccess(true);
+			result.setMessage(AppConfig.messages.getProperty("notif.success"));	
+		}catch(UnauthorizedUserException e){
+			result.setSuccess(false);
+			result.setMessage(AppConfig.messages.getProperty("notif.exception.unauthorizedUser"));
+		}catch(Exception e){
+			e.printStackTrace();
+			logger.error("Exception is: ", e);
+			result.setSuccess(false);
+			result.setMessage(AppConfig.messages.getProperty("notif.exception.unknownError"));
+		}
+		return result;
 	}
 	
 	/**
@@ -359,6 +412,40 @@ public class BaseController {
 		try{
 			CheckUserAuthorize.checkUser(principal, RoleEnum.ADM);
 			result = administrationService.relaunchPg(form);
+		}catch(UnauthorizedUserException e){
+			result.setSuccess(false);
+			result.setMessage(AppConfig.messages.getProperty("notif.exception.unauthorizedUser"));
+		}catch(Exception e){
+			e.printStackTrace();
+			logger.error("Exception is: ", e);
+			result.setSuccess(false);
+			result.setMessage(AppConfig.messages.getProperty("notif.exception.unknownError"));
+		}
+		return result;
+	}
+	
+	/**
+	 * Sauvegarde des infos du kifekoi
+	 * @return
+	 */
+	@RequestMapping("auth/uploadTaf")
+	public BusinessStatus UploadTaf(JwtAuthenticationToken principal, MultipartHttpServletRequest request){
+		logger.debug("IN");
+		BusinessStatus result = new BusinessStatus();
+
+		try{
+			CheckUserAuthorize.checkUser(principal, RoleEnum.ADM);
+			
+			MultipartFile file = null;
+			
+			for (Iterator<String> it = request.getFileNames(); it.hasNext();) {
+				file = request.getFile(it.next());
+				if(file != null){
+					result = administrationService.processTafFile(file);
+					break;
+				}
+			}
+						
 		}catch(UnauthorizedUserException e){
 			result.setSuccess(false);
 			result.setMessage(AppConfig.messages.getProperty("notif.exception.unauthorizedUser"));

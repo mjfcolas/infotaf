@@ -84,16 +84,18 @@ export default {
   },
   methods: {
     loadDatas: function () {
-      var self = this
-      console.log(loginHelper.username)
-      restAjax.authAjax({
-        url: 'auth/SimplePg',
-        data: {
-          pg: loginHelper.username
-        },
-        success: self.populateDatas,
-        error: utils.displayError
-      })
+      if (loginHelper.loggedIn) {
+        var self = this
+        console.log(loginHelper.username)
+        restAjax.authAjax({
+          url: 'auth/SimplePg',
+          data: {
+            pg: loginHelper.username
+          },
+          success: self.populateDatas,
+          error: utils.displayError
+        })
+      }
     },
     populateDatas: function (data) {
       this.formAccount.mail = data.mail

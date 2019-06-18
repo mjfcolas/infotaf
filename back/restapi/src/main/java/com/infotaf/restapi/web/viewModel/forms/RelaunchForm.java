@@ -27,11 +27,11 @@ public class RelaunchForm extends Serializable{
 		this.amount = amount;
 	}
 
-	public boolean isSimulation() {
+	public boolean getIsSimulation() {
 		return isSimulation;
 	}
 
-	public void setSimulation(boolean isSimulation) {
+	public void setIsSimulation(boolean isSimulation) {
 		this.isSimulation = isSimulation;
 	}
 	
