@@ -8,6 +8,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,7 +27,9 @@ import com.infotaf.taffilemanager.TafFileManager;
 public class AdministrationService implements IAdministrationService{
 	
 	private static final Logger logger = LoggerFactory.getLogger(AdministrationService.class);
-	
+
+	@Autowired
+	private Environment env;
 	@Autowired
 	protected PgService pgService;
 	@Autowired
@@ -72,13 +75,13 @@ public class AdministrationService implements IAdministrationService{
 				pg.getLastName() + " " + pg.getFirstName();
 
 				Mail mail = new Mail();
-				mail.setObject(AppConfig.mailProp.getProperty("mail.send.subject"));
+				mail.setObject(env.getRequiredProperty("mail.send.subject"));
 				
 				String formatedBody = rawBody.replace("{{NAME}}", pg.getFirstName());
 				formatedBody = formatedBody.replace("{{AMOUNT}}", AppConfig.df.format(pg.getTotalDu()));
 				mail.setBody(formatedBody);
 						
-				if(AppConfig.prop.getProperty("app.debugMode").equals("false")){
+				if(env.getRequiredProperty("app.debugMode").equals("false")){
 					mail.setAddress(pg.getMail());
 				}else{
 					mail.setAddress("infotaf@li212.fr");
@@ -89,7 +92,7 @@ public class AdministrationService implements IAdministrationService{
 		}
 		result.setMessage(message);
 		if(!form.getIsSimulation()){
-			MailSenderResult mailSenderResult = EmailSender.sendMail(mails);
+			MailSenderResult mailSenderResult = EmailSender.sendMail(mails, env);
 			result.setObject(mailSenderResult);
 		}
 		return result;

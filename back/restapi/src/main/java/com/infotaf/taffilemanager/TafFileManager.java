@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -55,8 +56,8 @@ public class TafFileManager {
 	private static final Logger logger = LoggerFactory.getLogger(TafFileManager.class);
 	private static boolean runFileWatcher = true;
 	private static boolean lock = false;
-	
 
+	private Environment env;
 	@Autowired
 	PgService pgService;
 	@Autowired
@@ -71,9 +72,15 @@ public class TafFileManager {
 	private ApplicationContext appContext;//Context Spring pour instancier RawTafFile (scope=prototype)
 	
 	protected File folder = null;
-	private int sleepTime = Integer.parseInt((String) AppConfig.prop.get("filewatcher.period"));
-	private RawTafFile rawTafFile;	
-	
+	private int sleepTime;
+	private RawTafFile rawTafFile;
+
+	@Autowired
+	public TafFileManager(Environment env){
+		this.env = env;
+		sleepTime = Integer.parseInt(env.getRequiredProperty("filewatcher.period"));
+	}
+
 	/**
 	 * Boucle infinie (sauf si runFileWatcher passe à false) surveillant un dossier et une boite mail
 	 * Temps de pause défini dans le fichier de config
@@ -98,139 +105,7 @@ public class TafFileManager {
 			Thread.sleep(sleepTime*1000);
 		}
 	}
-	
-	
-	/**
-	 * Lecture des mails pour chercher les pièces jointes qui peuvent être importées
-	 */
-	private void checkFilesInMails(){
-		try
-		{
-			Properties props = new Properties();
-	
-			String authMecanism = AppConfig.mailProp.getProperty("mail.server.authmechanism");
-			
-			props.put("mail.imap.ssl.enable", AppConfig.mailProp.getProperty("mail.server.enablessl"));
-			props.put("mail.imap.starttls.enable", AppConfig.mailProp.getProperty("mail.server.enablestarttls"));
-			props.put("mail.imap.auth.mechanisms", authMecanism);
-			
-			Session session = Session.getInstance(props);
-			Store store = session.getStore("imap");
-					  		    
-			//Paramètres pour connection avec actualisation du token d'accès si necessaire
-			String server = AppConfig.mailProp.getProperty("mail.server.imap");
-			String user = AppConfig.mailProp.getProperty("mail.server.imap.user");
-			
-			String passwordOrToken = "";
-			if(authMecanism.equals("XOAUTH2")){
-				passwordOrToken = AppConfig.googleToken.getAccessToken();
-			    
-			}else{
-				passwordOrToken = AppConfig.mailProp.getProperty("mail.credentials.imap.password");
-			}
-			store.connect(server, user, passwordOrToken);
 
-		    //create the folder object and open it
-		    Folder emailFolder = store.getFolder("INBOX");
-		    emailFolder.open(Folder.READ_ONLY);
-	
-		    // retrieve the messages from the folder in an array and print it
-		    Message[] messages = emailFolder.getMessages();
-		    boolean goodMailFound = false;
-		    
-		    //Récupération de la dernière date de mise à jour
-		    Date updateDate = paramService.getDateFromParam();
-		    
-		    for (int i = messages.length -1; i >= 0; i--) {
-		    	Message message = messages[i];
-		    	String mailSubject = message.getSubject();
-		    	//Seuls les mails avec le bon objet sont traités
-		    	if(AppConfig.mailProp.getProperty("mail.app.subject").equals(mailSubject)){
-			    	Map<String, InputStream> attachments = Utils.getAttachments(message);
-			    	//Seuls les mails avec une pièce jointe et une seule sont traités
-			    	if(attachments != null && attachments.size() == 1){
-			    		//Seuls les mails dont la date est postérieure à la date de mise à jour sont traités
-			    		//Traitement également si pas de date de mise à jour
-			    		Date mailDate = message.getSentDate();
-			    		if(updateDate == null || (mailDate != null && mailDate.compareTo(updateDate) > 0)){
-				    		for(Map.Entry<String, InputStream> entry : attachments.entrySet()) {
-				    		    if(isInputStreamCorrect(entry.getValue(), entry.getKey())){
-				    		    	logger.info("Found one correct attachment: {}", entry.getKey());
-				    		    	saveAttachment(entry.getValue(), entry.getKey());
-				    		    	goodMailFound = true;
-				    		    	break;
-				    		    }
-				    		}
-				    		if(goodMailFound){
-				    			break;
-				    		}
-			    		}
-			    		//Dans le cas ou les mails commencent à avoir des dates inférieures à la date de mise à jour, on arrète de chercher
-			    		if(updateDate != null && mailDate != null && mailDate.compareTo(updateDate) < 0){
-			    			break;
-			    		}
-			    	}
-		    	}
-		    }
-		    
-		    emailFolder.close(false);
-		    store.close();
-		    
-		} catch (NoSuchProviderException e) {
-	       e.printStackTrace();
-	    } catch (MessagingException e) {
-	       e.printStackTrace();
-	    } catch (Exception e) {
-	       e.printStackTrace();
-	    }
-	}
-	
-	/**
-	 * Sauvegarde d'un inputStream dans le dossier défini dans les paramètres
-	 * @param fileToSave
-	 * @param fileName
-	 */
-	private void saveAttachment(InputStream fileToSave, String fileName){
-		logger.info("Sauvegarde du fichier récupéré");
-		String directory = AppConfig.prop.getProperty("filewatcher.directory");
-		String tempFilePath = directory+"/"+fileName+".temp";
-		OutputStream outputStream = null;
-		try{
-			outputStream = new FileOutputStream(new File(tempFilePath));
-		
-			int read = 0;
-			byte[] bytes = new byte[1024];
-		
-			while ((read = fileToSave.read(bytes)) != -1) {
-				outputStream.write(bytes, 0, read);
-			}
-			
-			//Renommage du fichier
-			logger.info("Renommage du fichier récupéré");
-			File fileToRename = new File(tempFilePath);
-			File tgtFile = new File(directory+"/"+fileName);
-	        Files.move(fileToRename.toPath(), tgtFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (fileToSave != null) {
-				try {
-					fileToSave.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-			if (outputStream != null) {
-				try {
-					outputStream.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-	
-			}
-		}	
-	}
 	/**
 	 * Lecture d'un dossier pour importer les fichiers qui peuvent l'être
 	 * @throws IOException 
@@ -238,7 +113,7 @@ public class TafFileManager {
 	 */
 	private void checkFilesInFolder() throws FileNotFoundException, IOException{
 		lock = true;
-		String directory = (String) AppConfig.prop.get("filewatcher.directory");
+		String directory = env.getRequiredProperty("filewatcher.directory");
 		logger.trace("Verification des fichiers : {}", directory);
 		folder = new File(directory);
 		File[] listOfFiles = folder.listFiles();
@@ -248,7 +123,7 @@ public class TafFileManager {
 		    	if(isFileCorrect(listOfFiles[i])){
 		    		try{
 		    			BusinessStatus result = processFile(new FileInputStream(listOfFiles[i]));
-		    			Utils.RenameFile(listOfFiles[i], !result.isSuccess());
+		    			Utils.RenameFile(listOfFiles[i], !result.isSuccess(), env.getRequiredProperty("infotaf.dateformat"), env.getRequiredProperty("infotaf.errorsuffix"));
 	    			}catch(IOException e){
 	    				e.printStackTrace();
 	    			}
@@ -259,7 +134,7 @@ public class TafFileManager {
 	}
 	
 	private boolean checkExtension(String name){
-		String extension = (String) AppConfig.prop.get("filewatcher.extension");
+		String extension = env.getRequiredProperty("filewatcher.extension");
 		if(name != null && name.endsWith(extension)){
 			return true;
 		}
@@ -366,8 +241,8 @@ public class TafFileManager {
             reader.close();
             pgManipService.savePgManips(pgManips);
             //Enregistrement du paramètre
-            String dateFormat = (String) AppConfig.prop.get("infotaf.dateformat");
-            String keyParam = (String) AppConfig.configConstants.get("param.key.updatedate");
+            String dateFormat = env.getRequiredProperty("infotaf.dateformat");
+            String keyParam = env.getRequiredProperty("param.key.updatedate");
             String currentDate = new SimpleDateFormat(dateFormat).format(new Date());
             logger.info("Date de mise à jour : {}",  currentDate);
             paramService.saveParam(keyParam, currentDate);

@@ -3,6 +3,8 @@ package com.infotaf.restapi.security.auth.jwt;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -30,18 +32,15 @@ import io.jsonwebtoken.Jws;
 @Component
 @SuppressWarnings("unchecked")
 public class JwtAuthenticationProvider implements AuthenticationProvider {
-//    private final JwtSettings jwtSettings;
-//    
-//    @Autowired
-//    public JwtAuthenticationProvider(JwtSettings jwtSettings) {
-//        this.jwtSettings = jwtSettings;
-//    }
+
+    @Autowired
+    Environment env;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         RawAccessJwtToken rawAccessToken = (RawAccessJwtToken) authentication.getCredentials();
 
-        Jws<Claims> jwsClaims = rawAccessToken.parseClaims(AppConfig.prop.getProperty("security.tokenSigningKey"));
+        Jws<Claims> jwsClaims = rawAccessToken.parseClaims(env.getRequiredProperty("security.tokenSigningKey"));
         String subject = jwsClaims.getBody().getSubject();
         List<String> scopes = jwsClaims.getBody().get("scopes", List.class);
         List<GrantedAuthority> authorities = scopes.stream()

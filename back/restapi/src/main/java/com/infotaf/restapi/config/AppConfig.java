@@ -33,26 +33,16 @@ import com.googleToken.GoogleToken;
 @PropertySource(value = { "classpath:application.properties" })
 public class AppConfig{
 
-	//Propriétés 
-	public static Properties prop = new Properties();
-	public static Properties mailProp = new Properties();
-	public static Properties configConstants = new Properties();
+
 	public static Properties messages = new Properties();
-	
 	public static DataSource dataSource = null;
-	public static GoogleToken googleToken = null;
-	
 	public static DecimalFormat df = new DecimalFormat("#.00");
 	public static DecimalFormatSymbols dfs = df.getDecimalFormatSymbols();
 	
 	static{
 		try {
-			prop.load(AppConfig.class.getClassLoader().getResourceAsStream("application.properties"));
-			mailProp.load(AppConfig.class.getClassLoader().getResourceAsStream("mail.properties"));
-			configConstants.load(AppConfig.class.getClassLoader().getResourceAsStream("configConstants.properties"));
 			InputStream messageInput = AppConfig.class.getClassLoader().getResourceAsStream("message.properties");
 			messages.load(new InputStreamReader(messageInput, Charset.forName("UTF-8")));
-			googleToken = new GoogleToken();
 			dfs.setDecimalSeparator('.');
 		    df.setDecimalFormatSymbols(dfs);
 		} catch (IOException e) {

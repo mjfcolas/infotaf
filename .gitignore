@@ -12,3 +12,7 @@ infotaf-front/.scannerwork
 .scannerwork
 npm-debug.log
 sonar-project.properties
+.idea
+*.iml
+*.log
+

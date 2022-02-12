@@ -8,6 +8,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import com.infotaf.restapi.config.AppConfig;
@@ -27,20 +29,9 @@ import io.jsonwebtoken.SignatureAlgorithm;
  */
 @Component
 public class JwtTokenFactory {
-//    private final JwtSettings settings;
-//
-//    @Autowired
-//    public JwtTokenFactory(JwtSettings settings) {
-//        this.settings = settings;
-//    }
+    @Autowired
+    private Environment env;
 
-    /**
-     * Factory method for issuing new JWT Tokens.
-     * 
-     * @param username
-     * @param roles
-     * @return
-     */
     public AccessJwtToken createAccessJwtToken(UserContext userContext) {
         if (StringUtils.isBlank(userContext.getUsername())) 
             throw new IllegalArgumentException("Cannot create JWT Token without username");
@@ -55,12 +46,12 @@ public class JwtTokenFactory {
         
         String token = Jwts.builder()
           .setClaims(claims)
-          .setIssuer(AppConfig.prop.getProperty("security.tokenIssuer"))
+          .setIssuer(env.getRequiredProperty("security.tokenIssuer"))
           .setIssuedAt(Date.from(currentTime.atZone(ZoneId.systemDefault()).toInstant()))
           .setExpiration(Date.from(currentTime
-              .plusMinutes(Long.parseLong(AppConfig.prop.getProperty("security.tokenExpirationTime")))
+              .plusMinutes(Long.parseLong(env.getRequiredProperty("security.tokenExpirationTime")))
               .atZone(ZoneId.systemDefault()).toInstant()))
-          .signWith(SignatureAlgorithm.HS512, AppConfig.prop.getProperty("security.tokenSigningKey"))
+          .signWith(SignatureAlgorithm.HS512, env.getRequiredProperty("security.tokenSigningKey"))
         .compact();
 
         return new AccessJwtToken(token, claims);
@@ -78,13 +69,13 @@ public class JwtTokenFactory {
         
         String token = Jwts.builder()
           .setClaims(claims)
-          .setIssuer(AppConfig.prop.getProperty("security.tokenIssuer"))
+          .setIssuer(env.getRequiredProperty("security.tokenIssuer"))
           .setId(UUID.randomUUID().toString())
           .setIssuedAt(Date.from(currentTime.atZone(ZoneId.systemDefault()).toInstant()))
           .setExpiration(Date.from(currentTime
-              .plusMinutes(Long.parseLong(AppConfig.prop.getProperty("security.refreshTokenExpTime")))
+              .plusMinutes(Long.parseLong(env.getRequiredProperty("security.refreshTokenExpTime")))
               .atZone(ZoneId.systemDefault()).toInstant()))
-          .signWith(SignatureAlgorithm.HS512, AppConfig.prop.getProperty("security.tokenSigningKey"))
+          .signWith(SignatureAlgorithm.HS512, env.getRequiredProperty("security.tokenSigningKey"))
         .compact();
 
         return new AccessJwtToken(token, claims);

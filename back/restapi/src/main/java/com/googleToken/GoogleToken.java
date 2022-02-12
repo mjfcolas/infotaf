@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.infotaf.common.exceptions.BusinessException;
 import com.infotaf.restapi.config.AppConfig;
 import com.infotaf.taffilemanager.TafFileManager;
+import org.springframework.core.env.Environment;
 
 /**
  * Classe pour mettre à jour le token d'accès à l'API google
@@ -28,7 +29,7 @@ public class GoogleToken{
 
 	private static final Logger logger = LoggerFactory.getLogger(TafFileManager.class);
 	private static String TOKEN_URL = "https://www.googleapis.com/oauth2/v4/token";
-	
+
 	private String oauthClientId;
 	private String oauthSecret;
 	private String refreshToken;
@@ -41,10 +42,10 @@ public class GoogleToken{
 		this.setRefreshToken(refreshToken);
 	}
 	
-	public GoogleToken(){
-		String oauthClientId = AppConfig.mailProp.getProperty("mail.oautch.clientid");
-		String oauthSecret = AppConfig.mailProp.getProperty("mail.oauth.secret");
-		String refreshToken = AppConfig.mailProp.getProperty("mail.oauth.refreshtoken");
+	public GoogleToken(Environment env){
+		String oauthClientId = env.getRequiredProperty("mail.oautch.clientid");
+		String oauthSecret = env.getRequiredProperty("mail.oauth.secret");
+		String refreshToken = env.getRequiredProperty("mail.oauth.refreshtoken");
 		this.setOauthClientId(oauthClientId);
 		this.setOauthSecret(oauthSecret);
 		this.setRefreshToken(refreshToken);

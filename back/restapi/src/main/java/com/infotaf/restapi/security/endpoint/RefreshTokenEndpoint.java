@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
@@ -43,6 +44,8 @@ import com.infotaf.restapi.security.service.DatabaseUserService;
  */
 @RestController
 public class RefreshTokenEndpoint {
+    @Autowired
+    private Environment env;
     @Autowired private JwtTokenFactory tokenFactory;
     @Autowired private DatabaseUserService userService;
     @Autowired private TokenVerifier tokenVerifier;
@@ -53,7 +56,7 @@ public class RefreshTokenEndpoint {
         String tokenPayload = tokenExtractor.extract(request.getHeader(WebSecurityConfig.JWT_TOKEN_HEADER_PARAM));
         
         RawAccessJwtToken rawToken = new RawAccessJwtToken(tokenPayload);
-        RefreshToken refreshToken = RefreshToken.create(rawToken, AppConfig.prop.getProperty("security.tokenSigningKey")).orElseThrow(() -> new InvalidJwtToken());
+        RefreshToken refreshToken = RefreshToken.create(rawToken, env.getRequiredProperty("security.tokenSigningKey")).orElseThrow(() -> new InvalidJwtToken());
 
         String jti = refreshToken.getJti();
         if (!tokenVerifier.verify(jti)) {

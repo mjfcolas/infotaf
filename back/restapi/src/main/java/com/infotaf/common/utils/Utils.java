@@ -38,15 +38,13 @@ public class Utils{
 	 * @param srcFile Fichier à renommer
 	 * @throws IOException
 	 */
-	public static void RenameFile(File srcFile, boolean isError) throws IOException{
+	public static void RenameFile(File srcFile, boolean isError, String dateFormat, String errorSuffix) throws IOException{
 		logger.debug("IN - srcName: {}", srcFile.getName());
 		String oldName = srcFile.getName();
-        String dateFormat = (String) AppConfig.prop.get("infotaf.dateformat");
         String currentDate = new SimpleDateFormat(dateFormat).format(new Date());
         String path = srcFile.getPath().substring(0,srcFile.getPath().lastIndexOf(File.separator));
         String newName = path+File.separator+oldName+"."+currentDate;
         if(isError){
-        	String errorSuffix = (String) AppConfig.prop.get("infotaf.errorsuffix");
         	newName += errorSuffix;
         }
         logger.debug("newName: {}", newName);
@@ -110,30 +108,6 @@ public class Utils{
 	         return false;  
 	      }  
 	}
-	
-	/**
-	 * Récupération des pièces jointe d'un mail
-	 * @param message Message javamail
-	 * @return
-	 * @throws Exception
-	 */
-	public static Map<String, InputStream> getAttachments(Message message) throws Exception {
-	    Object content = message.getContent();
-	    if (content instanceof String)
-	        return null;        
-
-	    if (content instanceof Multipart) {
-	        Multipart multipart = (Multipart) content;
-	        Map<String, InputStream> result = new HashMap<String, InputStream>();
-
-	        for (int i = 0; i < multipart.getCount(); i++) {
-	            result.putAll(getAttachments(multipart.getBodyPart(i)));
-	        }
-	        return result;
-
-	    }
-	    return null;
-	}
 
 	/**
 	 * Récupération d'une pièce jointe d'un mail
@@ -162,29 +136,6 @@ public class Utils{
 	    }
 	    return result;
 	}
-	/**
-	 * Stocker un fichier complet dans un String
-	 * @param path Chemin du fichier à lire
-	 * @param encoding Charset à utiliser
-	 * @return String contenant tout le fichier
-	 * @throws IOException
-	 */
-	public static String readFile(File file, String encoding) 
-			  throws IOException 
-	{
-	  byte[] encoded = Files.readAllBytes(file.toPath());
-	  return new String(encoded, encoding);
-	}
-	
-	public static String readInputStream(InputStream inputStream, String encoding) 
-			  throws IOException 
-	{
-		StringWriter writer = new StringWriter();
-		IOUtils.copy(inputStream, writer, encoding);
-		String result = writer.toString();
-		return result;
-	}
-	
 	public static boolean checkPlainText(InputStream inputStream) {
 		 
         boolean result = false;

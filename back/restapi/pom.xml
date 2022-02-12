@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.infotaf.restapi</groupId>
   <artifactId>restapi</artifactId>
-  <version>0.0.7</version>
+  <version>0.0.8</version>
   
   <properties>
       <hibernate.version>5.0.11.Final</hibernate.version>
@@ -94,9 +94,7 @@
 	  <scope>test</scope>
 	</dependency>
   </dependencies>
-  
-  
-  
+
   <build>
      <plugins>
          <plugin>
@@ -104,10 +102,6 @@
              <artifactId>spring-boot-maven-plugin</artifactId>
          </plugin>
      </plugins>
-     <filters>
-	    <filter>profiles/${build.profile.id}/application.properties</filter>
-	    <filter>profiles/${build.profile.id}/mail.properties</filter>
-	</filters>
 	<resources>
 	    <resource>
 	        <filtering>true</filtering>
@@ -115,25 +109,4 @@
 	    </resource>
 	</resources>
   </build>
-  
-  <profiles>
-    <profile>
-        <id>dev</id>
-        <activation>
-            <activeByDefault>true</activeByDefault>
-        </activation>
-        <properties>
-            <build.profile.id>dev</build.profile.id>
-        </properties>
-    </profile>
-    <profile>
-        <id>prod</id>
-        <activation>
-            <activeByDefault>false</activeByDefault>
-        </activation>
-        <properties>
-            <build.profile.id>prod</build.profile.id>
-        </properties>
-    </profile>
-  </profiles>
 </project>
